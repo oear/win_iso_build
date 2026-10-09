@@ -1,0 +1,50 @@
+[
+  {
+    "url": "https://catalog.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/87b0c12b-7a6d-4f72-a5b2-8c50dff2e808/public/windows11.0-kb5122776-x64_5f8d90b01cefafca7089ea10d9c9d33861f540ff.msu",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://catalog.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/87b0c12b-7a6d-4f72-a5b2-8c50dff2e808/public/5f8d90b01cefafca7089ea10d9c9d33861f540ff.msu",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/updt/2026/07/windows11.0-kb5122776-x64_5f8d90b01cefafca7089ea10d9c9d33861f540ff.msu",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/updt/2026/08/windows11.0-kb5122776-x64_5f8d90b01cefafca7089ea10d9c9d33861f540ff.msu",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://catalog.s.download.windowsupdate.com/c/msdownload/update/software/updt/2026/07/windows11.0-kb5122776-x64_5f8d90b01cefafca7089ea10d9c9d33861f540ff.msu",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://catalog.s.download.windowsupdate.com/c/msdownload/update/software/updt/2026/08/windows11.0-kb5122776-x64_5f8d90b01cefafca7089ea10d9c9d33861f540ff.msu",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "finding": "Third-party discovery sources supplied only mirrors or forum ZIP attachments; no payload downloaded from them",
+    "sources": [
+      "https://www.elevenforum.com/t/get-ready-for-windows-11-version-26h2.47652/",
+      "https://www.deskmodder.de/blog/2026/09/18/kb5124137-windows-11-26h2-manueller-download-neue-insider-im-experimental-kanal/",
+      "https://jsb000.tistory.com/10936"
+    ],
+    "discovered_non_microsoft_hosts": [
+      "www.elevenforum.com attachments ZIP",
+      "t1p.de/13qw6 redirects to www.sendgb.com"
+    ],
+    "excluded": true
+  },
+  {
+    "finding": "Fresh UUP signed URLs were unexpired yet catalog.sf HTTPS translation returned 403 locally",
+    "expiry_utc": "2026-10-09T10:38:42Z",
+    "request_time_utc": "2026-10-09T10:28:28Z",
+    "files": [
+      "Windows11.0-KB5122776-x64.cab",
+      "Windows11.0-KB5122776-x64.msu"
+    ],
+    "response": "403",
+    "temporary_query_saved": false
+  }
+]

@@ -1,0 +1,155 @@
+name: Experimental LTSC native ISO trial
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_native_trial:
+        description: 'Run the reviewed native DISM trial (unofficial, installation acceptance pending)'
+        type: boolean
+        required: true
+        default: false
+      draft_tag:
+        description: 'Existing unpublished draft release for private ISO transfer; leave empty for logs only'
+        type: string
+        required: false
+      checkpoint_mode:
+        description: 'auto = latest CU discovers checkpoints; sequential = isolated checkpoint then commit/remount'
+        type: choice
+        options: [auto, sequential]
+        default: auto
+
+permissions:
+  contents: read
+
+concurrency:
+  group: experimental-ltsc-native
+  cancel-in-progress: false
+
+jobs:
+  native-trial:
+    if: inputs.run_native_trial && github.repository != 'adavak/win_iso_build'
+    runs-on: windows-2025
+    timeout-minutes: 150
+    permissions:
+      contents: write # Only for uploading to a pre-existing, still-unpublished draft.
+    env:
+      DRAFT_TAG: ${{ inputs.draft_tag }}
+      SOURCE_COMMIT: ${{ github.sha }}
+      GH_REPO: ${{ github.repository }}
+      CHECKPOINT_MODE: ${{ inputs.checkpoint_mode }}
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Validate code and prepare an isolated disposable build workspace
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python -m unittest discover -s tests -v
+          if ($LASTEXITCODE -ne 0) { throw 'Input/transfer tests failed.' }
+          foreach ($file in Get-ChildItem experimental -Filter *.ps1) {
+            $tokens = $null; $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$parseErrors) | Out-Null
+            if ($parseErrors.Count) { $parseErrors | Format-List; throw ('Parser failed: ' + $file.Name) }
+          }
+          $root = Join-Path $env:RUNNER_TEMP ('ltsc-native-' + $env:GITHUB_RUN_ID)
+          New-Item -ItemType Directory -Path $root | Out-Null
+          "LTSC_WORK_ROOT=$root" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          $disks = Get-Volume | Select-Object DriveLetter, FileSystem, Size, SizeRemaining
+          $disks | ConvertTo-Json | Set-Content (Join-Path $root 'host-volumes-before.json') -Encoding UTF8
+          # This cleanup applies solely to the disposable GitHub-hosted machine,
+          # never to a user's computer, self-hosted runner, or the Windows image.
+          if ($env:RUNNER_ENVIRONMENT -eq 'github-hosted' -and $env:RUNNER_TOOL_CACHE -match 'hostedtoolcache') {
+            foreach ($dir in Get-ChildItem -LiteralPath $env:RUNNER_TOOL_CACHE -Directory) {
+              if ($dir.Name -match '^(CodeQL|go|node|Ruby|PyPy|Java_Temurin-Hotspot_jdk)$') {
+                Write-Host ('Remove unused hosted compiler cache: ' + $dir.Name)
+                Remove-Item -LiteralPath $dir.FullName -Recurse -Force
+              }
+            }
+          }
+          $disk = [IO.DriveInfo]::new([IO.Path]::GetPathRoot($root))
+          if ($disk.DriveFormat -ne 'NTFS' -or $disk.AvailableFreeSpace -lt 55GB) {
+            throw ('Need 55 GiB of NTFS free space before acquiring inputs; currently {0:N1} GiB.' -f ($disk.AvailableFreeSpace / 1GB))
+          }
+          Get-Volume | Select-Object DriveLetter, FileSystem, Size, SizeRemaining |
+            ConvertTo-Json | Set-Content (Join-Path $root 'host-volumes-after.json') -Encoding UTF8
+          Get-CimInstance Win32_Processor | Select-Object Name, VMMonitorModeExtensions, VirtualizationFirmwareEnabled |
+            ConvertTo-Json | Set-Content (Join-Path $root 'host-virtualization.json') -Encoding UTF8
+      - name: Get the hash-pinned Microsoft image-generation tool
+        run: |
+          $tool = & experimental/Get-Oscdimg.ps1 -OutputDirectory (Join-Path $env:LTSC_WORK_ROOT 'oscdimg')
+          "LTSC_OSCDIMG=$tool" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Acquire and verify the locked base ISO
+        run: |
+          python experimental/prepare.py acquire-base --destination (Join-Path $env:LTSC_WORK_ROOT 'base')
+          if ($LASTEXITCODE -ne 0) { throw 'Base ISO acquisition failed.' }
+          $lock = Get-Content experimental/manifest.json -Raw | ConvertFrom-Json
+          # Delete only this run's verified mirror ZIP inputs after preserving
+          # the verified full ISO, avoiding a second copy of the 5 GiB archive.
+          foreach ($part in $lock.base_iso.parts) {
+            Remove-Item -LiteralPath (Join-Path $env:LTSC_WORK_ROOT ('base\' + $part.filename))
+          }
+      - name: Acquire original UUP payloads and verify every full SHA256
+        run: |
+          python experimental/prepare.py acquire-packages --downloader aria2 --destination (Join-Path $env:LTSC_WORK_ROOT 'packages')
+          if ($LASTEXITCODE -ne 0) { throw 'UUP payload acquisition failed.' }
+      - name: Review the candidate input and run native DISM without applicability overrides
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packagePath = Join-Path $env:LTSC_WORK_ROOT 'packages'
+          $inspectionPath = & experimental/Inspect-EnablementPackage.ps1 -PackagePath (Join-Path $packagePath 'Windows11.0-KB5122776-x64.cab') -OutputDirectory (Join-Path $env:LTSC_WORK_ROOT 'ekb-trust')
+          $inspection = Get-Content -LiteralPath $inspectionPath -Raw | ConvertFrom-Json
+          if (-not $inspection.verification_scope.all_catalog_signatures_valid_and_microsoft -or -not $inspection.update_mum.parent_declares_enterprise_s) { throw 'EKB source review did not pass.' }
+          $lock = Get-Content experimental/manifest.json -Raw | ConvertFrom-Json
+          foreach ($package in $lock.packages) {
+            $file = Join-Path $packagePath $package.filename
+            if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant() -ne $package.sha256 -or (Get-Item -LiteralPath $file).Length -ne $package.size) { throw 'Full payload review failed.' }
+          }
+          # The explicit dispatch allows a native trial only after byte and
+          # source review. This per-run copy never marks the project compatible.
+          $lock.status = 'ready-for-offline-trial'
+          $reviewed = Join-Path $env:LTSC_WORK_ROOT 'trial-manifest.json'
+          $lock | ConvertTo-Json -Depth 16 | Set-Content -LiteralPath $reviewed -Encoding UTF8
+          $base = Join-Path $env:LTSC_WORK_ROOT ('base\' + $lock.base_iso.filename)
+          & experimental/Build-Ltsc.ps1 -Apply -AllowPendingFirstBoot -CheckpointMode $env:CHECKPOINT_MODE -AcceptUnverifiedMirrorProvenance -ManifestPath $reviewed -BaseIso $base -PackageDirectory $packagePath -WorkDirectory (Join-Path $env:LTSC_WORK_ROOT 'trial') -OscdimgPath $env:LTSC_OSCDIMG
+      - name: Transfer a successful candidate only to an existing unpublished draft
+        if: success() && inputs.draft_tag != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:DRAFT_TAG -notmatch '^experimental-native-[A-Za-z0-9-]+$') { throw 'Invalid draft transfer tag.' }
+          $release = gh release view $env:DRAFT_TAG --json isDraft,targetCommitish | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0 -or -not $release.isDraft -or $release.targetCommitish -ne $env:SOURCE_COMMIT) { throw 'Transfer destination must be an unpublished draft pinned to this source commit.' }
+          $trial = Join-Path $env:LTSC_WORK_ROOT 'trial'
+          $reportPath = Join-Path $trial 'logs\build-report.json'
+          $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json
+          $iso = Join-Path $trial $report.iso_filename
+          $parts = Join-Path $env:LTSC_WORK_ROOT 'delivery'
+          python experimental/package_iso.py split --iso $iso --report $reportPath --destination $parts
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate transfer packaging failed.' }
+          foreach ($file in Get-ChildItem -LiteralPath $parts -File) {
+            $release = gh release view $env:DRAFT_TAG --json isDraft | ConvertFrom-Json
+            if (-not $release.isDraft) { throw 'Draft was published externally; stop transfer.' }
+            gh release upload $env:DRAFT_TAG $file.FullName
+            if ($LASTEXITCODE -ne 0) { throw ('Draft upload failed: ' + $file.Name) }
+          }
+          gh release upload $env:DRAFT_TAG $reportPath
+          if ($LASTEXITCODE -ne 0) { throw 'Build report transfer failed.' }
+      - name: Preserve native evidence even when integration refuses a package
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: experimental-native-evidence-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/ltsc-native-${{ github.run_id }}/*.json
+            ${{ runner.temp }}/ltsc-native-${{ github.run_id }}/oscdimg/*.json
+            ${{ runner.temp }}/ltsc-native-${{ github.run_id }}/ekb-trust/*.json
+            ${{ runner.temp }}/ltsc-native-${{ github.run_id }}/trial/logs/**
+          retention-days: 7
+          if-no-files-found: warn

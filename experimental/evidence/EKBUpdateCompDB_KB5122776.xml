@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CompDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" CreatedDate="2026-07-31T16:38:29.6769182Z" Revision="1" SchemaVersion="1.2" Product="Desktop" BuildID="00000000-0000-0000-0000-000000000000" BuildInfo="ge_release_flt.26100.6.260716-1700" OSVersion="10.0.26100.6" BuildArch="amd64" Type="BuildUpdate" TargetBuildID="00000000-0000-0000-0000-000000000000" TargetBuildInfo="ge_prerelease_im.26100.9071.260730-1233" TargetOSVersion="10.0.26100.9071" EKBTargetVersion="10.0.26340.0" xmlns="http://schemas.microsoft.com/embedded/2004/10/ImageUpdate">
+  <Tags Type="CumulativeUpdate">
+    <Tag Name="UpdateType" Value="Canonical" />
+  </Tags>
+  <Features>
+    <Feature Type="GDR" FeatureID="GDR_KB5122776" FMID="MSDN" Group="Microsoft">
+      <Packages>
+        <Package ID="Package_for_KB5122776" PackageType="FeaturePackage" />
+      </Packages>
+    </Feature>
+  </Features>
+  <MSConditionalFeatures>
+    <ConditionalFeature UpdateAction="Add" FeatureID="GDR_KB5122776" FMID="MSDN">
+      <ConditionSet Operator="OR">
+        <Conditions>
+          <Condition Type="PackageWithVersion" Status="NotInstalled" Name="Package_for_KB5122776~31bf3856ad364e35~amd64~~26100.9071.1.0" />
+          <Condition Type="NameValuePair" Name="InplaceUpgrade" Value="1" />
+        </Conditions>
+      </ConditionSet>
+    </ConditionalFeature>
+  </MSConditionalFeatures>
+  <Packages>
+    <Package ID="Package_for_KB5122776" InstalledSize="39881" Version="26100.9071.1.0">
+      <Payload>
+        <PayloadItem PayloadHash="/PEQHMxt4mPIlHaBYODwJpVSaSSgp2ZZM8XphD9k5zc=" PayloadSize="25866" Path="Windows11.0-KB5122776-x64.cab" PayloadType="PSFX" />
+        <PayloadItem PayloadHash="9UBirW43spZD4pjd4tBY1Bb97HQrsR03lweiwJpVCLo=" PayloadSize="26138" Path="Windows11.0-KB5122776-x64-baseless.cab" PayloadType="ExpressCab" />
+        <PayloadItem PayloadHash="mnI30iO8R7ueMLyrqY6sKc/6VNe4iscrsITGp9fdKLY=" PayloadSize="43143" Path="Windows11.0-KB5122776-x64-baseless.psf" PayloadType="ExpressPSF" />
+      </Payload>
+    </Package>
+  </Packages>
+</CompDB>

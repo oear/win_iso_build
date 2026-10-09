@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "id": "ltsc-2024-zh-cn-x64-26340.9616-experimental",
+  "unofficial": true,
+  "target": {
+    "build": "26340.9616",
+    "edition": "EnterpriseS",
+    "architecture": "x64",
+    "language": "zh-CN"
+  },
+  "status": "research",
+  "base_iso": {
+    "filename": "zh-cn_windows_11_enterprise_ltsc_2024_x64_dvd_cff9cd2d.iso",
+    "size": 5287520256,
+    "sha256": "2cb21649590c8cf770cd93556596dff4fd800f24d267a9be9d9ce0ee9e03f5ac",
+    "hash_provenance": "adavak/win_iso_build .github/version-config.json at 06a411fe11d6f5f469c5bb87f34b4af41510d1a7; not independently verified against Microsoft subscription metadata",
+    "official_hash_verified": false,
+    "mirror_release": "https://github.com/adavak/win_iso_zip/releases/tag/Windows_11_LTSC_2024_X64_ZH-CN",
+    "parts": [
+      {
+        "filename": "zh-cn_windows_11_enterprise_ltsc_2024_x64_dvd_cff9cd2d.zip.001",
+        "size": 2097152000,
+        "sha256": "22586ca02f85b892b308ff7263014776e9af13872250ff9b0acb256faf0df681"
+      },
+      {
+        "filename": "zh-cn_windows_11_enterprise_ltsc_2024_x64_dvd_cff9cd2d.zip.002",
+        "size": 2097152000,
+        "sha256": "1a9cc3148b2037a62aa126feea9219557badec0be18c3e47438eea24c9ba1db0"
+      },
+      {
+        "filename": "zh-cn_windows_11_enterprise_ltsc_2024_x64_dvd_cff9cd2d.zip.003",
+        "size": 940110119,
+        "sha256": "6611934eab8e4f66ca9b873859b3ea17329c2e4aba8e563681843163318ad958"
+      }
+    ]
+  },
+  "uup": {
+    "id": "398e3bc2-9c3f-4d87-b40b-e54a46826056",
+    "index_url": "https://uupdump.net/selectlang.php?id=398e3bc2-9c3f-4d87-b40b-e54a46826056",
+    "provenance": "third-party index of Microsoft delivery metadata"
+  },
+  "dependency_review": {
+    "complete": true,
+    "evidence": "evidence/uup-evidence.json; downloaded CompDB (catalog signature not yet verified) declares checkpoint 26100.6 -> 26100.1746 -> 26100.9616, EP target 26340.0; authentic signature/trust still pending; ancillary .NET/Setup/SafeOS packages omitted from install.wim-only MVP"
+  },
+  "packages": [
+    {
+      "id": "KB5122055",
+      "role": "checkpoint",
+      "filename": "Windows11.0-KB5122055-x64.msu",
+      "size": 886899629,
+      "sha1": "9e0f01624159b4ca5a1ae162e01f34f7835fc606",
+      "sha256": "1efa7df6d2d733533e5d912bff75db817156b2af16e92a67d16668ffd695bfef",
+      "source_host": "tlu.dl.delivery.mp.microsoft.com",
+      "source_path": "/filestreamingservice/files/d9944a32-ee29-4019-b964-581eca214308",
+      "package_identity": "Package_for_RollupFix~31bf3856ad364e35~amd64~~26100.1746.1.3",
+      "review_evidence": "evidence/uup-evidence.json and CompDB/MUM: static identity and checkpoint chain; Windows trust/applicability pending"
+    },
+    {
+      "id": "KB5127753",
+      "role": "cumulative",
+      "filename": "Windows11.0-KB5127753-x64.msu",
+      "size": 4851429447,
+      "sha1": "ded32c8f2cefe512c4e44e0732d8a302c86d0bd1",
+      "sha256": "4989c72091dab5487a4646081c334d713aa782b80b0b5a913f27dd600f946140",
+      "source_host": "tlu.dl.delivery.mp.microsoft.com",
+      "source_path": "/filestreamingservice/files/3f9186ea-b18b-4ae5-ac67-3d68fb168dce",
+      "package_identity": "Package_for_RollupFix~31bf3856ad364e35~amd64~~26100.9616.1.1",
+      "review_evidence": "evidence/uup-evidence.json and CompDB/MUM: static identity and checkpoint chain; Windows trust/applicability pending"
+    },
+    {
+      "id": "KB5122776",
+      "role": "enablement",
+      "filename": "Windows11.0-KB5122776-x64.cab",
+      "size": 25866,
+      "sha1": "48ff373bb765d1e64b3b3987eccc19c3dbc46154",
+      "sha256": "fcf1101ccc6de263c894768160e0f02695526924a0a7665933c5e9843f64e737",
+      "source_host": "tlu.dl.delivery.mp.microsoft.com",
+      "source_path": "/filestreamingservice/files/651f60c0-0ba9-45ff-90fa-c263793f91a6",
+      "package_identity": "Package_for_KB5122776~31bf3856ad364e35~amd64~~26100.9071.1.0",
+      "review_evidence": "evidence/uup-evidence.json and CompDB/MUM: static identity and checkpoint chain; Windows trust/applicability pending"
+    }
+  ],
+  "servicing_order": [
+    "KB5122055",
+    "KB5127753",
+    "KB5122776"
+  ],
+  "media_scope": "install.wim only; boot.wim, Setup and WinRE retain the base-media versions in this MVP",
+  "runtime_acceptance": "pending"
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "tool": "oscdimg",
+  "architecture": "x64",
+  "file_version": "2.56",
+  "adk_version": "10.1.26100.9457",
+  "source_verified_at_utc": "2026-10-09T10:53:27Z",
+  "official_reference": "https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install",
+  "bootstrapper": {
+    "official_link": "https://go.microsoft.com/fwlink/?linkid=2289980",
+    "url": "https://download.microsoft.com/download/8e0c0f5a-abb5-4358-a51b-168eb40b1590/adk/adksetup.exe",
+    "size": 2233776,
+    "sha256": "ac6a930fdb5c2980ba5fefe606d47edaafcf5f647b4337411500d158ea77300f",
+    "sha1": "f8eb6a9c155b2bc93d460f29e9bcbb8f1e1a2683",
+    "resource_version": "10.1.26100.9457",
+    "embedded_authenticode_present": true
+  },
+  "msi": {
+    "url": "https://download.microsoft.com/download/8e0c0f5a-abb5-4358-a51b-168eb40b1590/adk/Installers/Oscdimg%20%28DesktopEditions%29-x86_en-us.msi",
+    "size": 581632,
+    "sha256": "2a6d603b51bfac8fdcb28a8db3fb474b1f7e54df0b14a6662b958a401bb178e3",
+    "sha1": "196f82fcf0d947c25f6df6830b00d272ac7652c3",
+    "bootstrapper_payload_id": "package_OscdimgDesktopEditions_x86_en_us",
+    "bootstrapper_sha1_matches": true
+  },
+  "cab": {
+    "url": "https://download.microsoft.com/download/8e0c0f5a-abb5-4358-a51b-168eb40b1590/adk/Installers/bbf55224a0290f00676ddc410f004498.cab",
+    "size": 77696,
+    "sha256": "4f6351fe31ff58aa5ef81e407ef74071b149f0b42e200b4c036398c1068d687b",
+    "sha1": "87c309f8bddab125b6acc4e93c2e0ba0b4fcf5d0",
+    "bootstrapper_payload_id": "pay7C9D0E165E90E72F5E31917FB67BACF1",
+    "bootstrapper_sha1_matches": true
+  },
+  "executable": {
+    "cab_member": "fild40c79d789d460e48dc1cbd485d6fc2e",
+    "output_filename": "oscdimg.exe",
+    "size": 154024,
+    "sha256": "d2709f8099ddd202bc41bcb399ecd5638503c6466f416d1a321769af83a70c3a",
+    "sha1": "a590464c4a820a0e1728a25a7fa088fb2ee43a52",
+    "pe_machine": "0x8664",
+    "embedded_authenticode_present": true
+  },
+  "catalog": {
+    "cab_member": "catbbf55224a0290f00676ddc410f004498",
+    "size": 11135,
+    "sha256": "5510f0e4a0077f6690241126a1cd2c90acb583ae44acd844035bcfd120d33777",
+    "sha1": "ab0b924ecb540b3a21a5929affdcfd74db2ce8af"
+  },
+  "trust_evidence": {
+    "static_signer_subject": "C=US, ST=Washington, L=Redmond, O=Microsoft Corporation, CN=Microsoft Corporation",
+    "static_signer_issuer": "C=US, O=Microsoft Corporation, CN=Microsoft Windows Code Signing PCA 2024",
+    "windows_authenticode_status": "pending-native-verification",
+    "catalog_membership_status": "not-independently-verified",
+    "notes": "Static PE/PKCS7 parsing confirms embedded signatures and stated certificates, not Windows chain/revocation trust. Before execution require locked hashes, Get-AuthenticodeSignature Valid, and Microsoft organization; extract only the named x64 member. No Windows executable was run during source acquisition."
+  }
+}

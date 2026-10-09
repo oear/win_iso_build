@@ -1,0 +1,663 @@
+{
+  "schema_version": 1,
+  "inspection_status": "metadata-inspected",
+  "inspected_at_utc": "2026-10-09T10:31:26.5742381Z",
+  "package": {
+    "source_path": "hash-pinned owner-supplied CAB cache on GitHub Windows-2025 audit host",
+    "size_bytes": 25866,
+    "expected_sha256": "fcf1101ccc6de263c894768160e0f02695526924a0a7665933c5e9843f64e737",
+    "snapshot_sha256": "fcf1101ccc6de263c894768160e0f02695526924a0a7665933c5e9843f64e737",
+    "sha256_matches": true
+  },
+  "expand_tool": "C:\\Windows\\System32\\expand.exe",
+  "update_mum": {
+    "assembly_identity": {
+      "name": "Package_for_KB5122776",
+      "version": "26100.9071.1.0",
+      "processor_architecture": "amd64",
+      "language": "neutral",
+      "public_key_token": "31bf3856ad364e35",
+      "build_type": "",
+      "version_scope": ""
+    },
+    "assembly_attributes": {
+      "xmlns": "urn:schemas-microsoft-com:asm.v3",
+      "manifestVersion": "1.0",
+      "description": "Fix for KB5122776",
+      "displayName": "Feature Enablement for Windows (Ge) 26H2 Insider Refresh - KB5122776 - 2026.08 A - BuildNumber Update",
+      "company": "Microsoft Corporation",
+      "copyright": "Microsoft Corporation",
+      "supportInformation": "https://support.microsoft.com/help/5122776",
+      "creationTimeStamp": "2026-07-31T16:23:05Z",
+      "lastUpdateTimeStamp": "2026-07-31T16:23:05Z"
+    },
+    "package_attributes": {
+      "identifier": "KB5122776",
+      "applicabilityEvaluation": "deep",
+      "releaseType": "Update",
+      "restart": "possible"
+    },
+    "parent_groups": [
+      {
+        "attributes": {
+          "buildCompare": "EQ",
+          "integrate": "separate",
+          "disposition": "detect"
+        },
+        "assembly_identities": [
+          {
+            "name": "Microsoft-Windows-CoreCountrySpecificEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-CoreEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-CoreNEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-EnterpriseEvalEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-EnterpriseGEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-EnterpriseSEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-EnterpriseSEvalEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-EnterpriseSNEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-EnterpriseSNEvalEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ProfessionalEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ProfessionalNEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerAzureStackHCICorEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerDatacenterCorEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerDatacenterEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerDatacenterEvalCorEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerDatacenterEvalEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerDatacenterNanoEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerStandardCorEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerStandardEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerStandardEvalCorEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerStandardEvalEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerTurbineCorEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-ServerTurbineEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-UtilityVMEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-WinPE-Package",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-WinVOSEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          },
+          {
+            "name": "Microsoft-Windows-WNCEdition",
+            "version": "10.0.26100.6",
+            "processor_architecture": "amd64",
+            "language": "neutral",
+            "public_key_token": "31bf3856ad364e35",
+            "build_type": "release",
+            "version_scope": ""
+          }
+        ]
+      }
+    ],
+    "parent_edition_identities": [
+      {
+        "name": "Microsoft-Windows-CoreCountrySpecificEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-CoreEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-CoreNEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseEvalEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseGEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseSEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseSEvalEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseSNEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseSNEvalEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ProfessionalEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ProfessionalNEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerAzureStackHCICorEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterCorEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterEvalCorEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterEvalEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterNanoEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerStandardCorEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerStandardEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerStandardEvalCorEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerStandardEvalEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerTurbineCorEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-ServerTurbineEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-UtilityVMEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-WinVOSEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      {
+        "name": "Microsoft-Windows-WNCEdition",
+        "version": "10.0.26100.6",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      }
+    ],
+    "parent_declares_enterprise_s": true,
+    "sha256": "cff60d3c522916528c2bceaa1aacd00b55f5006b7e662c6721c0753f6ab4e818"
+  },
+  "child_mums": [
+    {
+      "file": "Microsoft-Windows-Ge-Client-Server-26340-Version-Enablement-Package~31bf3856ad364e35~amd64~~10.0.26100.9071.mum",
+      "sha256": "1c5dde8c1947931066fb327f95e883d04062772de85e71ad17f548ae9a4cab47",
+      "assembly_identity": {
+        "name": "Microsoft-Windows-Ge-Client-Server-26340-Version-Enablement-Package",
+        "version": "10.0.26100.9071",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      "referenced_assembly_identities": [
+        {
+          "name": "Microsoft-Windows-Ge-Client-Server-26340-Version-Enablement-Payload-Package",
+          "version": "10.0.26100.9071",
+          "processor_architecture": "amd64",
+          "language": "neutral",
+          "public_key_token": "31bf3856ad364e35",
+          "build_type": "release",
+          "version_scope": ""
+        }
+      ]
+    },
+    {
+      "file": "Microsoft-Windows-Ge-Client-Server-26340-Version-Enablement-Payload-Package~31bf3856ad364e35~amd64~~10.0.26100.9071.mum",
+      "sha256": "cc2edeb277fac30a2ed54a2f8c8ffd85c63d33b7c6693abecaf1c89cd1bb425c",
+      "assembly_identity": {
+        "name": "Microsoft-Windows-Ge-Client-Server-26340-Version-Enablement-Payload-Package",
+        "version": "10.0.26100.9071",
+        "processor_architecture": "amd64",
+        "language": "neutral",
+        "public_key_token": "31bf3856ad364e35",
+        "build_type": "release",
+        "version_scope": ""
+      },
+      "referenced_assembly_identities": [
+        {
+          "name": "Microsoft-Windows-Ge-Client-Server-26340-Version-Enablement-Payload-Deployment",
+          "version": "10.0.26100.9071",
+          "processor_architecture": "amd64",
+          "language": "neutral",
+          "public_key_token": "31bf3856ad364e35",
+          "build_type": "release",
+          "version_scope": "nonSxS"
+        }
+      ]
+    }
+  ],
+  "catalogs": [
+    {
+      "file": "Microsoft-Windows-Ge-Client-Server-26340-Version-Enablement-Package~31bf3856ad364e35~amd64~~10.0.26100.9071.cat",
+      "sha256": "ed4287c58e6c17ca8153b846d30413e9aad21a84ad6f5fd425c3c72d9ffaf362",
+      "signature_status": "Valid",
+      "signature_status_message": "Signature verified.",
+      "microsoft_publisher": true,
+      "signer_certificate": {
+        "subject": "CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "issuer": "CN=Microsoft Development PCA 2014, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "thumbprint": "1C9F651F18DF1C9C653FB960992A5C1A40C3E896",
+        "not_before_utc": "2026-06-18T23:43:26.0000000Z",
+        "not_after_utc": "2027-10-31T23:43:26.0000000Z"
+      },
+      "timestamp_certificate": {
+        "subject": "CN=Microsoft Time-Stamp Service, OU=nShield TSS ESN:9600-05E0-D947, OU=Microsoft America Operations, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "issuer": "CN=Microsoft Time-Stamp PCA 2010, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "thumbprint": "A2FDF33116D92AAFB5CC5DDB11C9653495228767",
+        "not_before_utc": "2026-02-19T19:40:02.0000000Z",
+        "not_after_utc": "2027-05-17T19:40:02.0000000Z"
+      }
+    },
+    {
+      "file": "Microsoft-Windows-Ge-Client-Server-26340-Version-Enablement-Payload-Package~31bf3856ad364e35~amd64~~10.0.26100.9071.cat",
+      "sha256": "99716c2a2e1e08c4419b09bdaa92fa5a7724b343cc65a3ad1c31aa92108a1aea",
+      "signature_status": "Valid",
+      "signature_status_message": "Signature verified.",
+      "microsoft_publisher": true,
+      "signer_certificate": {
+        "subject": "CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "issuer": "CN=Microsoft Development PCA 2014, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "thumbprint": "1C9F651F18DF1C9C653FB960992A5C1A40C3E896",
+        "not_before_utc": "2026-06-18T23:43:26.0000000Z",
+        "not_after_utc": "2027-10-31T23:43:26.0000000Z"
+      },
+      "timestamp_certificate": {
+        "subject": "CN=Microsoft Time-Stamp Service, OU=nShield TSS ESN:9200-05E0-D947, OU=Microsoft America Operations, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "issuer": "CN=Microsoft Time-Stamp PCA 2010, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "thumbprint": "3845616CFA44E2667A198808F506D623F3308D6A",
+        "not_before_utc": "2026-02-19T19:39:57.0000000Z",
+        "not_after_utc": "2027-05-17T19:39:57.0000000Z"
+      }
+    },
+    {
+      "file": "update.cat",
+      "sha256": "c6714c350227fc0e3199a69ce2b87f00509935d279faf15738c614bc9bb1d10c",
+      "signature_status": "Valid",
+      "signature_status_message": "Signature verified.",
+      "microsoft_publisher": true,
+      "signer_certificate": {
+        "subject": "CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "issuer": "CN=Microsoft Development PCA 2014, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "thumbprint": "1C9F651F18DF1C9C653FB960992A5C1A40C3E896",
+        "not_before_utc": "2026-06-18T23:43:26.0000000Z",
+        "not_after_utc": "2027-10-31T23:43:26.0000000Z"
+      },
+      "timestamp_certificate": {
+        "subject": "CN=Microsoft Time-Stamp Service, OU=nShield TSS ESN:8603-05E0-D947, OU=Microsoft America Operations, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "issuer": "CN=Microsoft Time-Stamp PCA 2010, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+        "thumbprint": "536FE6CA38F0230817E5873C3911706E496C5E0E",
+        "not_before_utc": "2026-02-19T19:40:01.0000000Z",
+        "not_after_utc": "2027-05-17T19:40:01.0000000Z"
+      }
+    }
+  ],
+  "verification_scope": {
+    "all_catalog_signatures_valid_and_microsoft": true,
+    "payload_catalog_membership_verified": false,
+    "actual_ltsc_applicability_verified": false,
+    "package_installed": false,
+    "limitations": [
+      "Valid CAT signatures verify those catalog signatures only; payload membership has not been checked.",
+      "Edition parent declarations are metadata; actual LTSC applicability and prerequisites require DISM/CBS on the intended image.",
+      "The CAB wrapper is not required to be Authenticode-signed and was not treated as a signed executable.",
+      "No package installation, registry edits, ACL changes, activation changes, or downloaded payload execution was performed."
+    ]
+  },
+  "audit_run_url": "https://github.com/oear/win_iso_build/actions/runs/37918088811",
+  "audited_code_commit": "59fdebbe7885801e92d554a9a1629a59a59c23dd",
+  "network_acquisition_verified_in_this_run": false
+}
