@@ -13,6 +13,7 @@ param(
     [string]$Python = 'python',
     [switch]$Apply,
     [switch]$AllowPendingFirstBoot,
+    [ValidateSet('auto', 'sequential')][string]$CheckpointMode = 'auto',
     [switch]$AcceptUnverifiedMirrorProvenance
 )
 Set-StrictMode -Version Latest
@@ -84,6 +85,7 @@ $report = [ordered]@{
     host_build = $hostBuild; media_scope = $manifest.media_scope
     status = 'running'; runtime_acceptance = 'pending'; packages = @(); errors = @()
     commands = @(); firstboot_required = $false; free_bytes_at_start = $drive.AvailableFreeSpace
+    checkpoint_mode = $CheckpointMode
     base_sha256 = $manifest.base_iso.sha256
     microsoft_iso_provenance_verified = $manifest.base_iso.official_hash_verified
     oscdimg_sha256 = (Get-FileHash -LiteralPath $OscdimgPath -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -132,10 +134,12 @@ function Read-ImageVersion([string]$ImagePath) {
 try {
     $cumulativeGroup = Join-Path $staging 'cumulative'
     $enablementGroup = Join-Path $staging 'enablement'
-    foreach ($dir in @($cumulativeGroup, $enablementGroup)) { New-Item -ItemType Directory -Path $dir | Out-Null }
+    $checkpointGroup = Join-Path $staging 'checkpoint'
+    foreach ($dir in @($cumulativeGroup, $enablementGroup, $checkpointGroup)) { New-Item -ItemType Directory -Path $dir | Out-Null }
     foreach ($p in $manifest.packages) {
         $group = $cumulativeGroup
         if ($p.role -eq 'enablement') { $group = $enablementGroup }
+        if ($p.role -eq 'checkpoint' -and $CheckpointMode -eq 'sequential') { $group = $checkpointGroup }
         $snapshot = Join-Path $group $p.filename
         Copy-Item -LiteralPath (Join-Path $PackageDirectory $p.filename) -Destination $snapshot
         if ((Get-FileHash -LiteralPath $snapshot -Algorithm SHA256).Hash.ToLowerInvariant() -ne $p.sha256 -or
@@ -189,6 +193,22 @@ try {
     # Give native 24H2+ DISM the latest cumulative MSU. It discovers the locked
     # checkpoint siblings in this isolated folder in their required order.
     $latest = $manifest.packages | Where-Object { $_.role -eq 'cumulative' }
+    if ($CheckpointMode -eq 'sequential') {
+        foreach ($p in $manifest.packages | Where-Object { $_.role -eq 'checkpoint' }) {
+            Write-Host ('Native isolated checkpoint: ' + $p.id)
+            Invoke-Dism @("/Image:$mount", '/Add-Package', ('/PackagePath:' + (Join-Path $checkpointGroup $p.filename)), '/NoRestart') | Out-Null
+            $inventory = @(Get-WindowsPackage -Path $mount)
+            $installed = @($inventory | Where-Object { $_.PackageName -eq $p.package_identity -and [string]$_.PackageState -in 'Installed', 'InstallPending' })
+            if (-not $installed.Count) { throw ('Isolated checkpoint did not stage: ' + $p.id) }
+            $report.checkpoint_image = Read-ImageVersion $mount
+            $report.checkpoint_inventory = @($inventory | Select-Object PackageName, PackageState)
+            Dismount-WindowsImage -Path $mount -Save -CheckIntegrity | Out-Null
+            $wimMounted = $false
+            Mount-WindowsImage -ImagePath $wim -Index 1 -Path $mount -CheckIntegrity | Out-Null
+            $wimMounted = $true
+        }
+    }
+    Write-Host ('Native latest cumulative update: ' + $latest.id)
     Invoke-Dism @("/Image:$mount", '/Add-Package', ('/PackagePath:' + (Join-Path $cumulativeGroup $latest.filename)), '/NoRestart') | Out-Null
     foreach ($p in $manifest.packages | Where-Object { $_.role -in 'checkpoint', 'cumulative' }) {
         $inventory = @(Get-WindowsPackage -Path $mount)
@@ -262,9 +282,27 @@ try {
     $report.iso_filename = [IO.Path]::GetFileName($outputIso)
     Write-Output $outputIso
 } catch {
+    $nativeFailure = $_
     $report.status = 'failed-no-accepted-iso'
-    $report.errors += $_.Exception.Message
-    throw
+    $report.errors += $nativeFailure.Exception.Message
+    if ($wimMounted) {
+        try {
+            $cbsLog = Join-Path $mount 'Windows\Logs\CBS\CBS.log'
+            if (Test-Path -LiteralPath $cbsLog) { Copy-Item -LiteralPath $cbsLog -Destination (Join-Path $logs 'failed-offline-CBS.log') }
+            $report.failed_inventory = @(Get-WindowsPackage -Path $mount | Select-Object PackageName, PackageState)
+            $report.failed_image = Read-ImageVersion $mount
+            $compression = @()
+            foreach ($path in @((Join-Path $env:WINDIR 'System32\msdelta.dll'), (Join-Path $env:WINDIR 'System32\UpdateCompression.dll'),
+                (Join-Path $mount 'Windows\System32\msdelta.dll'), (Join-Path $mount 'Windows\System32\UpdateCompression.dll'))) {
+                if (Test-Path -LiteralPath $path) {
+                    $compression += [ordered]@{ path = $path; version = (Get-Item -LiteralPath $path).VersionInfo.FileVersion;
+                        sha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() }
+                }
+            }
+            $report.compression_libraries_on_failure = $compression
+        } catch { $report.errors += ('Failure diagnostic collection incomplete: ' + $_.Exception.Message) }
+    }
+    throw $nativeFailure
 } finally {
     $cleanupFailed = $false
     if ($wimMounted) {

@@ -12,6 +12,11 @@ on:
         description: 'Existing unpublished draft release for private ISO transfer; leave empty for logs only'
         type: string
         required: false
+      checkpoint_mode:
+        description: 'auto = latest CU discovers checkpoints; sequential = isolated checkpoint then commit/remount'
+        type: choice
+        options: [auto, sequential]
+        default: auto
 
 permissions:
   contents: read
@@ -31,6 +36,7 @@ jobs:
       DRAFT_TAG: ${{ inputs.draft_tag }}
       SOURCE_COMMIT: ${{ github.sha }}
       GH_REPO: ${{ github.repository }}
+      CHECKPOINT_MODE: ${{ inputs.checkpoint_mode }}
     defaults:
       run:
         shell: powershell
@@ -110,7 +116,7 @@ jobs:
           $reviewed = Join-Path $env:LTSC_WORK_ROOT 'trial-manifest.json'
           $lock | ConvertTo-Json -Depth 16 | Set-Content -LiteralPath $reviewed -Encoding UTF8
           $base = Join-Path $env:LTSC_WORK_ROOT ('base\' + $lock.base_iso.filename)
-          & experimental/Build-Ltsc.ps1 -Apply -AllowPendingFirstBoot -AcceptUnverifiedMirrorProvenance -ManifestPath $reviewed -BaseIso $base -PackageDirectory $packagePath -WorkDirectory (Join-Path $env:LTSC_WORK_ROOT 'trial') -OscdimgPath $env:LTSC_OSCDIMG
+          & experimental/Build-Ltsc.ps1 -Apply -AllowPendingFirstBoot -CheckpointMode $env:CHECKPOINT_MODE -AcceptUnverifiedMirrorProvenance -ManifestPath $reviewed -BaseIso $base -PackageDirectory $packagePath -WorkDirectory (Join-Path $env:LTSC_WORK_ROOT 'trial') -OscdimgPath $env:LTSC_OSCDIMG
       - name: Transfer a successful candidate only to an existing unpublished draft
         if: success() && inputs.draft_tag != ''
         env:
