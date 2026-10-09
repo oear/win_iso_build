@@ -166,8 +166,11 @@ try {
     $sourceImages = @(Get-ChildItem -LiteralPath (Join-Path $root 'sources') -File | Where-Object { $_.Name -in 'install.wim', 'install.esd' })
     if ($sourceImages.Count -ne 1) { throw 'Base media must contain exactly one install.wim or install.esd.' }
     $source = $sourceImages[0].FullName
-    $choices = @(Get-WindowsImage -ImagePath $source | ForEach-Object { Get-WindowsImage -ImagePath $source -Index $_.ImageIndex } |
-        Where-Object { $_.EditionId -eq 'EnterpriseS' -and [int]$_.Architecture -eq 9 -and $_.Version.Build -eq 26100 -and (@($_.Languages) -contains 'zh-CN') })
+    $baseImages = @(Get-WindowsImage -ImagePath $source | ForEach-Object { Get-WindowsImage -ImagePath $source -Index $_.ImageIndex })
+    $report.base_image_candidates = @($baseImages | Select-Object ImageIndex, ImageName, EditionId, Architecture, Version, Languages,
+        @{ Name = 'VersionRuntimeType'; Expression = { $_.Version.GetType().FullName } })
+    $choices = @($baseImages | Where-Object { $_.EditionId -eq 'EnterpriseS' -and [int]$_.Architecture -eq 9 -and
+        ([version]([string]$_.Version)).Build -eq 26100 -and (@($_.Languages) -contains 'zh-CN') })
     if ($choices.Count -ne 1) { throw 'Expected exactly one EnterpriseS x64 zh-CN 26100 base index (no edition conversion).' }
     $report.source_index = $choices[0].ImageIndex
     $report.source_image_metadata = $choices[0] | Select-Object ImageIndex, ImageName, EditionId, Architecture, Version, Languages
