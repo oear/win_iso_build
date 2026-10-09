@@ -12,6 +12,7 @@ param(
     [string]$OscdimgPath,
     [string]$Python = 'python',
     [switch]$Apply,
+    [switch]$AllowPendingFirstBoot,
     [switch]$AcceptUnverifiedMirrorProvenance
 )
 Set-StrictMode -Version Latest
@@ -49,6 +50,10 @@ $PackageDirectory = (Resolve-Path -LiteralPath $PackageDirectory).ProviderPath
 $OscdimgPath = (Resolve-Path -LiteralPath $OscdimgPath).ProviderPath
 $WorkDirectory = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($WorkDirectory)
 if (Test-Path -LiteralPath $WorkDirectory) { throw 'WorkDirectory must be a new directory; existing work is never overwritten.' }
+$drive = [IO.DriveInfo]::new([IO.Path]::GetPathRoot($WorkDirectory))
+if ($drive.DriveFormat -ne 'NTFS' -or $drive.AvailableFreeSpace -lt 40GB) {
+    throw 'The new working directory needs a local NTFS volume with at least 40 GiB free after acquiring inputs.'
+}
 if ((Get-FileHash -LiteralPath $BaseIso -Algorithm SHA256).Hash.ToLowerInvariant() -ne $manifest.base_iso.sha256 -or
     (Get-Item -LiteralPath $BaseIso).Length -ne $manifest.base_iso.size) { throw 'Base ISO integrity mismatch.' }
 $toolSignature = Get-AuthenticodeSignature -LiteralPath $OscdimgPath
@@ -71,20 +76,28 @@ $logs = Join-Path $WorkDirectory 'logs'
 $media = Join-Path $WorkDirectory 'media'
 $mount = Join-Path $WorkDirectory 'mount'
 $staging = Join-Path $WorkDirectory 'servicing-inputs'
-foreach ($dir in @($logs, $media, $mount, $staging)) { New-Item -ItemType Directory -Path $dir | Out-Null }
+$scratch = Join-Path $WorkDirectory 'scratch'
+foreach ($dir in @($logs, $media, $mount, $staging, $scratch)) { New-Item -ItemType Directory -Path $dir | Out-Null }
 Copy-Item -LiteralPath $ManifestPath -Destination (Join-Path $logs 'manifest.json')
 $report = [ordered]@{
     unofficial = $true; target = $manifest.target; started_utc = [DateTime]::UtcNow.ToString('o')
     host_build = $hostBuild; media_scope = $manifest.media_scope
     status = 'running'; runtime_acceptance = 'pending'; packages = @(); errors = @()
+    commands = @(); firstboot_required = $false; free_bytes_at_start = $drive.AvailableFreeSpace
     base_sha256 = $manifest.base_iso.sha256
     microsoft_iso_provenance_verified = $manifest.base_iso.official_hash_verified
     oscdimg_sha256 = (Get-FileHash -LiteralPath $OscdimgPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    builder_sha256 = (Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    manifest_sha256 = (Get-FileHash -LiteralPath $ManifestPath -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 $isoMounted = $false
 $wimMounted = $false
 $nativeSequence = 0
 $dism = Join-Path $env:WINDIR 'System32\dism.exe'
+$report.dism_sha256 = (Get-FileHash -LiteralPath $dism -Algorithm SHA256).Hash.ToLowerInvariant()
+$report.dism_file_version = (Get-Item -LiteralPath $dism).VersionInfo.FileVersion
+$report.powershell_version = $PSVersionTable.PSVersion.ToString()
+$report.dism_module_version = (Get-Module -ListAvailable DISM | Select-Object -First 1).Version.ToString()
 
 function Invoke-Dism([string[]]$Arguments) {
     $script:nativeSequence++
@@ -92,10 +105,11 @@ function Invoke-Dism([string[]]$Arguments) {
     $savedPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try {
-        $result = & $script:dism /English @Arguments ('/LogPath:' + (Join-Path $script:logs ($label + '.log'))) 2>&1
+        $result = & $script:dism /English @Arguments ("/ScratchDir:$script:scratch") ('/LogPath:' + (Join-Path $script:logs ($label + '.log'))) 2>&1
         $code = $LASTEXITCODE
     } finally { $ErrorActionPreference = $savedPreference }
     $result | Out-File -LiteralPath (Join-Path $script:logs ($label + '.txt')) -Encoding UTF8
+    $script:report.commands += [ordered]@{ label = $label; arguments = $Arguments; exit_code = $code }
     if ($code -notin 0, 3010) { throw ('DISM failed ({0}); inspect {1}' -f $code, $label) }
     return ($result -join "`n")
 }
@@ -153,18 +167,35 @@ try {
     if ($sourceImages.Count -ne 1) { throw 'Base media must contain exactly one install.wim or install.esd.' }
     $source = $sourceImages[0].FullName
     $choices = @(Get-WindowsImage -ImagePath $source | ForEach-Object { Get-WindowsImage -ImagePath $source -Index $_.ImageIndex } |
-        Where-Object { $_.EditionId -eq 'EnterpriseS' -and [int]$_.Architecture -eq 9 -and [string]$_.Version -like '10.0.26100.*' -and (@($_.Languages) -contains 'zh-CN') })
+        Where-Object { $_.EditionId -eq 'EnterpriseS' -and [int]$_.Architecture -eq 9 -and $_.Version.Build -eq 26100 -and (@($_.Languages) -contains 'zh-CN') })
     if ($choices.Count -ne 1) { throw 'Expected exactly one EnterpriseS x64 zh-CN 26100 base index (no edition conversion).' }
     $report.source_index = $choices[0].ImageIndex
+    $report.source_image_metadata = $choices[0] | Select-Object ImageIndex, ImageName, EditionId, Architecture, Version, Languages
+    # The immutable source remains mounted. Remove only the redundant work copy
+    # of the original install image before exporting the single trial index.
+    foreach ($name in 'install.wim', 'install.esd') {
+        $old = Join-Path $media ('sources\' + $name)
+        if (Test-Path -LiteralPath $old) { Remove-Item -LiteralPath $old }
+    }
     $wim = Join-Path $WorkDirectory 'install-trial.wim'
     Export-WindowsImage -SourceImagePath $source -SourceIndex $choices[0].ImageIndex -DestinationImagePath $wim -CompressionType Max -CheckIntegrity | Out-Null
     Mount-WindowsImage -ImagePath $wim -Index 1 -Path $mount -CheckIntegrity | Out-Null
     $wimMounted = $true
     $report.base_image = Read-ImageVersion $mount
     if ($report.base_image.edition -ne 'EnterpriseS' -or $report.base_image.build -ne '26100') { throw 'Base hive is not the expected LTSC.' }
-    # Isolate the MSU checkpoint group: DISM discovers only reviewed siblings.
-    foreach ($id in $manifest.servicing_order) {
-        $p = $manifest.packages | Where-Object { $_.id -eq $id }
+    # Give native 24H2+ DISM the latest cumulative MSU. It discovers the locked
+    # checkpoint siblings in this isolated folder in their required order.
+    $latest = $manifest.packages | Where-Object { $_.role -eq 'cumulative' }
+    Invoke-Dism @("/Image:$mount", '/Add-Package', ('/PackagePath:' + (Join-Path $cumulativeGroup $latest.filename)), '/NoRestart') | Out-Null
+    foreach ($p in $manifest.packages | Where-Object { $_.role -in 'checkpoint', 'cumulative' }) {
+        $inventory = @(Get-WindowsPackage -Path $mount)
+        $allowedStates = @('Installed', 'InstallPending')
+        if ($p.role -eq 'checkpoint') { $allowedStates += 'Superseded' }
+        $installed = @($inventory | Where-Object { $_.PackageName -eq $p.package_identity -and [string]$_.PackageState -in $allowedStates })
+        if ($installed.Count -eq 0) { throw ('Native checkpoint/CU staging did not produce the locked identity: ' + $p.id) }
+        $report.packages += [ordered]@{ id = $p.id; sha256 = $p.sha256; identities = @($installed.PackageName); states = @($installed | ForEach-Object { [string]$_.PackageState }) }
+    }
+    foreach ($p in $manifest.packages | Where-Object { $_.role -eq 'enablement' }) {
         $group = $cumulativeGroup
         if ($p.role -eq 'enablement') { $group = $enablementGroup }
         $path = Join-Path $group $p.filename
@@ -173,7 +204,7 @@ try {
             if ($info -notmatch '(?m)^\s*Applicable\s*:\s*Yes\s*$') { throw ('CAB not applicable: ' + $p.id) }
             if ($info -notmatch [regex]::Escape($p.package_identity)) { throw ('Unexpected CAB identity: ' + $p.id) }
         }
-        # Native DISM validates catalog trust and applicability. No IgnoreCheck,
+        # Native CBS/DISM applies its own package verification policy. No IgnoreCheck,
         # expanded child-MUM installation, cleanup, ResetBase, or host servicing.
         Invoke-Dism @("/Image:$mount", '/Add-Package', "/PackagePath:$path", '/NoRestart') | Out-Null
         $inventory = @(Get-WindowsPackage -Path $mount)
@@ -183,13 +214,22 @@ try {
     }
     $report.actual_image = Read-ImageVersion $mount
     $actual = $report.actual_image.build + '.' + $report.actual_image.ubr
+    $report.offline_observed_version = $actual
+    $report.kernel_file_version = (Get-Item -LiteralPath (Join-Path $mount 'Windows\System32\ntoskrnl.exe')).VersionInfo.FileVersion
     if ($actual -ne $manifest.target.build -or $report.actual_image.edition -ne 'EnterpriseS') {
-        throw ('Actual offline image is {0}/{1}; target is {2}/EnterpriseS. No ISO emitted. If CBS defers version changes, investigate first-boot staging separately.' -f $actual, $report.actual_image.edition, $manifest.target.build)
+        $pending = @($report.packages | Where-Object { 'InstallPending' -in $_.states }).Count -gt 0
+        if (-not $AllowPendingFirstBoot -or -not $pending -or $report.actual_image.edition -ne 'EnterpriseS' -or
+            $report.actual_image.build -notin '26100', '26340') {
+            throw ('Actual offline image is {0}/{1}; target is {2}/EnterpriseS. No accepted ISO emitted.' -f $actual, $report.actual_image.edition, $manifest.target.build)
+        }
+        $report.firstboot_required = $true
     }
     Invoke-Dism @("/Image:$mount", '/Cleanup-Image', '/ScanHealth') | Out-Null
     $health = Repair-WindowsImage -Path $mount -CheckHealth
     if ([string]$health.ImageHealthState -ne 'Healthy') { throw 'Offline component store is not Healthy.' }
     $report.inventory = @(Get-WindowsPackage -Path $mount | Select-Object PackageName, PackageState)
+    $cbsLog = Join-Path $mount 'Windows\Logs\CBS\CBS.log'
+    if (Test-Path -LiteralPath $cbsLog) { Copy-Item -LiteralPath $cbsLog -Destination (Join-Path $logs 'offline-CBS.log') }
     Dismount-WindowsImage -Path $mount -Save -CheckIntegrity | Out-Null
     $wimMounted = $false
     foreach ($name in 'install.wim', 'install.esd') {
@@ -198,6 +238,9 @@ try {
     }
     Move-Item -LiteralPath $wim -Destination (Join-Path $media 'sources\install.wim')
     $outputIso = Join-Path $WorkDirectory ('UNOFFICIAL-EXPERIMENTAL-LTSC-' + $manifest.target.build + '-zh-CN-x64.iso')
+    if ($report.firstboot_required) {
+        $outputIso = Join-Path $WorkDirectory ('UNOFFICIAL-CANDIDATE-requested-' + $manifest.target.build + '-offline-' + $actual + '-zh-CN-x64.iso')
+    }
     $pendingIso = Join-Path $WorkDirectory 'unverified-output.pending.iso'
     $bios = Join-Path $media 'boot\etfsboot.com'
     $uefi = Join-Path $media 'efi\microsoft\boot\efisys.bin'
@@ -212,6 +255,8 @@ try {
     $report.iso_sha256 = (Get-FileHash -LiteralPath $pendingIso -Algorithm SHA256).Hash.ToLowerInvariant()
     Move-Item -LiteralPath $pendingIso -Destination $outputIso
     $report.status = 'offline-image-verified-runtime-pending'
+    if ($report.firstboot_required) { $report.status = 'native-packages-staged-firstboot-pending' }
+    $report.iso_filename = [IO.Path]::GetFileName($outputIso)
     Write-Output $outputIso
 } catch {
     $report.status = 'failed-no-accepted-iso'
@@ -228,6 +273,7 @@ try {
         catch { $cleanupFailed = $true; $report.errors += ('ISO detach failed: ' + $_.Exception.Message) }
     }
     $report.finished_utc = [DateTime]::UtcNow.ToString('o')
+    $report.free_bytes_at_end = $drive.AvailableFreeSpace
     if ($cleanupFailed) { $report.status = 'cleanup-incomplete' }
     $report | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $logs 'build-report.json') -Encoding UTF8
     if ($cleanupFailed) { throw 'Mount cleanup incomplete. Inspect build-report.json and the host mounts before continuing.' }

@@ -31,7 +31,9 @@ python experimental/prepare.py acquire-base --destination C:\LTSC-input\base
 python experimental/prepare.py acquire-packages --only-enablement --destination C:\LTSC-input\ekb
 ```
 
-获取器不会运行下载内容。UUP 的临时签名 URL 只在内存中使用。它把原始 path/query 映射到 `https://catalog.sf.dl.delivery.mp.microsoft.com`，保持 TLS 证书校验，再核对锁定 SHA256/SHA1/大小。小 EKB 的等价 HTTPS 字节曾验证成功，但随后本机和 Windows 云端都遇到 403，**此机制尚不稳定，在线下载链尚未验证可完整重现**。遇到拒绝或哈希漂移直接停止，不回退 HTTP、不关闭证书校验。已取得的本地缓存可在相同目标目录按锁定哈希重新验证后使用。
+获取器不会运行下载内容。UUP 元数据使用 HTTPS 并保留正常证书校验，临时签名 URL 不写入报告。下载内容时**原样使用 UUP 返回的 Microsoft 地址，不自行改域名或协议**。该源目前使用 HTTP；[Microsoft 的 Windows Update 安全说明](https://learn.microsoft.com/en-us/windows/deployment/update/windows-update-security)明确区分 HTTPS 元数据与可采用 HTTP 的更新内容，并要求安装前校验哈希与数字签名。本项目额外核对固定 build、架构、源域名/path、完整 SHA256/SHA1/大小，再交由原生 Windows CBS/DISM 验证包。UUP dump 仍是第三方索引，HTTPS 不把它变成微软的官方担保。
+
+此前把原始地址转换到另一个 Microsoft HTTPS 域名的路线会返回 403，已移除。2026-10-09 已通过原始地址完整获取 KB5122055 和 KB5127753，并匹配全部固定哈希。较大的文件建议加 `--downloader aria2`：采用多连接与断点续传，同时保持证书校验开启；其进程输出不会把临时链接写入报告。Python 单连接模式拒绝重定向；aria2 可能遵循内容 CDN 的重定向，完整固定 SHA256 与原生包验证仍不可跳过。本地缓存也必须重新匹配锁定哈希。
 
 ```powershell
 .\experimental\Inspect-EnablementPackage.ps1 `
@@ -39,7 +41,7 @@ python experimental/prepare.py acquire-packages --only-enablement --destination 
   -OutputDirectory C:\LTSC-evidence\ekb-unique
 ```
 
-此命令只展开 CAB、读取 MUM 和检查 CAT。默认信任若拒绝，报告保留失败；不得导入开发根、修改 flight signing 或打开 testsigning。有效 CAT 签名仍不等于整个包可服务 LTSC。GitHub `Experimental LTSC source and Windows audit` 工作流可手动运行，也会在实验分支 push 时运行，权限只有 `contents: read`，并保留失败证据。仓库所有者可通过临时 `LTSC_AUDIT_EKB_BASE64` secret 提供此前核验的小 CAB 缓存用于信任审计；它必须匹配同一锁定 SHA256，审计后删除该临时输入。这类运行会单独记录缓存来源，不能作为在线下载成功的证据。
+此命令只展开 CAB、读取 MUM 和检查 CAT。默认信任若拒绝，报告保留失败；不得导入开发根、修改 flight signing 或打开 testsigning。有效 CAT 签名仍不等于整个包可服务 LTSC。GitHub `Experimental LTSC source and Windows audit` 工作流可手动运行，也会在实验分支 push 时运行，权限只有 `contents: read`，并保留失败证据。现在可直接从原始 UUP 地址取包；旧的缓存输入审计保留为历史证据，不能混同为在线获取成功。
 
 ## 原生离线试构建入口
 
@@ -59,7 +61,11 @@ python experimental/prepare.py acquire-packages --only-enablement --destination 
 
 `-AcceptUnverifiedMirrorProvenance` 表示已读过候选镜像来源限制，不授予任何 Windows 许可。选择微软授权渠道原 ISO且哈希相同后，可在审核记录中补充来源佐证，而非盲目把 flag 设为 true。
 
-驱动只选择 `EnterpriseS/x64/zh-CN/26100` 索引，在新副本中原生 `Add-Package`，不使用 `IgnoreCheck` 或子 MUM 强装。CAB 检查 `Applicable: Yes`；MSU 不支持 `Get-PackageInfo`，由 `Add-Package` 默认检查并复读包状态。检查点 MSU 分组只允许审核过的兄弟文件。任何失败停止并丢弃挂载更改，保留日志。读取离线 Edition/CurrentBuildNumber/UBR、核验目标 `26340.9616/EnterpriseS`、检查组件健康后才生成带 `UNOFFICIAL-EXPERIMENTAL` 名称的 ISO。如果版本变更需首次启动才能完成，首版会保守拒绝输出，先研究 CBS 状态。
+驱动只选择 `EnterpriseS/x64/zh-CN/26100` 索引，在新副本中原生 `Add-Package`，不使用 `IgnoreCheck` 或子 MUM 强装。CAB 检查 `Applicable: Yes`；MSU 不支持 `Get-PackageInfo`，由 `Add-Package` 默认检查并复读包状态。最新 LCU 仅从隔离目录发现审核过的检查点，检查点被替代时可记录 `Superseded`；CU/EKB 必须是 Installed/InstallPending。任何失败停止并丢弃挂载更改，保留日志。离线版本精确为 `26340.9616/EnterpriseS` 且组件健康时，生成 `UNOFFICIAL-EXPERIMENTAL` ISO。
+
+如果 CBS 将版本动作留待首次启动，默认仍拒绝输出；显式 `-AllowPendingFirstBoot` 只在完整的精确包身份、正常暂存状态与 EnterpriseS 身份都通过时生成 **UNOFFICIAL-CANDIDATE**，文件名与报告同时保留请求版本及离线观察版本，标记 `firstboot_required=true`。不能把这种候选文件称为已经安装成功的 26340.9616，不修改注册表凑版本。
+
+`Experimental LTSC native ISO trial` 是单独的手动入口，默认不执行。它记录资源、工具与 native CBS/DISM 证据，使用锁定的 Microsoft ADK 10.1.26100.9457 x64 oscdimg，只提取并核验签名，不安装 ADK。镜像只可传到操作者预建的、匹配源 commit 且未发布的 Draft Release，分卷各小于 2 GiB；流程没有发布发行版的命令。个人 fork 的默认工作入口已设为实验分支，以便手动调度；main 与上游正式入口保持原样。
 
 **MVP 仅服务 install.wim。boot.wim、Setup 和 WinRE 保留原始版本**；后续需要独立验证 Setup/SafeOS 更新与恢复环境。输入与配方固定可重现；并未保证 DISM/oscdimg 输出逐字节相同，日志会记录主机版本、工具哈希、包状态和 ISO 哈希。
 

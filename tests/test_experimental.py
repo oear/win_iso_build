@@ -72,6 +72,16 @@ class LockSafetyTests(unittest.TestCase):
         prepare.copy_bounded(io.BytesIO(b'123'), destination, 3)
         self.assertEqual(destination.getvalue(), b'123')
 
+    def test_original_signed_uup_url_is_preserved_and_origin_changes_rejected(self):
+        package = self.lock['packages'][0]
+        url = 'http://' + package['source_host'] + package['source_path'] + '?P1=expiry&P2=signed'
+        self.assertEqual(prepare.original_uup_url(url, package), url)
+        for changed in [url.replace('tlu.dl.delivery.mp.microsoft.com', 'evil.test'),
+                        url.replace(package['source_path'], '/different-file'),
+                        url.replace('http://', 'http://user:pass@'), url + '#fragment']:
+            with self.subTest(url=changed), self.assertRaises(ValueError):
+                prepare.original_uup_url(changed, package)
+
     def test_tampered_or_truncated_bytes_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'package.cab'

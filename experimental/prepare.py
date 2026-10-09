@@ -9,6 +9,7 @@ import hashlib
 import json
 import re
 import shutil
+import subprocess
 import sys
 import urllib.parse
 import urllib.request
@@ -131,7 +132,20 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         raise ValueError('Package or metadata redirect is not allowed')
 
 
-def acquire_packages(m, destination, only_enablement=False):
+def original_uup_url(url, locked):
+    parsed = urllib.parse.urlsplit(url)
+    require(parsed.hostname == locked['source_host'] == 'tlu.dl.delivery.mp.microsoft.com'
+            and parsed.path == locked['source_path']
+            and parsed.scheme in ('http', 'https') and not parsed.username and not parsed.password
+            and not parsed.fragment and parsed.port in (None, 80 if parsed.scheme == 'http' else 443),
+            'UUP delivery origin/path drift')
+    # Metadata and locked SHA256 come over HTTPS; Microsoft payload bytes may
+    # use HTTP. Preserve the signed source URL exactly. Native signature and
+    # catalog membership verification are still required before installation.
+    return url
+
+
+def acquire_packages(m, destination, only_enablement=False, downloader='python'):
     selected = [p for p in m['packages'] if not only_enablement or p['role'] == 'enablement']
     require(selected, 'No locked packages selected')
     if all((destination / p['filename']).exists() for p in selected):
@@ -142,41 +156,66 @@ def acquire_packages(m, destination, only_enablement=False):
         'id': m['uup']['id'], 'pack': 0, 'edition': 0})
     opener = urllib.request.build_opener(NoRedirect())
     request = urllib.request.Request(api, headers={'User-Agent': 'Mozilla/5.0 LTSC-Experimental-Research'})
-    with opener.open(request, timeout=60) as response:
-        payload = json.load(response)['response']
+    def get_payload():
+        with opener.open(request, timeout=60) as response:
+            payload = json.load(response)['response']
+        require(payload['build'] == m['target']['build'] and payload['arch'] == 'amd64', 'UUP returned a different build or architecture')
+        return payload
+    payload = get_payload()
     require(payload['build'] == m['target']['build'] and payload['arch'] == 'amd64', 'UUP returned a different build or architecture')
     destination.mkdir(parents=True, exist_ok=True)
     require(not destination.is_symlink(), 'Destination cannot be a symlink')
     results = []
     for p in selected:
+        if (destination / p['filename']).exists():
+            results.append({'filename': p['filename'], 'source': 'verified-local-cache', **check_file(destination / p['filename'], p)})
+            continue
+        # Signed URLs expire; refresh before each large file instead of reusing
+        # the first file's authorization after a potentially long transfer.
+        payload = get_payload()
         indexed = payload['files'][p['filename']]
         for key in ('sha256', 'sha1', 'size'):
             require(str(indexed[key]) == str(p[key]), 'UUP metadata drift for ' + p['filename'])
-        parsed = urllib.parse.urlsplit(indexed['url'])
-        require(parsed.hostname == p['source_host'] and parsed.path == p['source_path']
-                and parsed.scheme in ('http', 'https') and not parsed.username and not parsed.password
-                and parsed.port in (None, 80, 443), 'UUP delivery origin/path drift')
-        # Verified for the small EKB only. Other payloads may reject this origin;
-        # they then fail without a transport downgrade. Default TLS checks stay on.
-        secure_url = urllib.parse.urlunsplit(('https', 'catalog.sf.dl.delivery.mp.microsoft.com', parsed.path, parsed.query, ''))
+        source_url = original_uup_url(indexed['url'], p)
         path = destination / p['filename']
         if not path.exists():
             partial = path.with_suffix(path.suffix + '.partial')
-            require(not partial.exists(), 'Interrupted package download exists: ' + partial.name)
+            if downloader == 'python':
+                require(not partial.exists(), 'Interrupted package download exists: ' + partial.name)
+            else:
+                require(not partial.is_symlink(), 'Download partial cannot be a symlink')
             print('Downloading ' + p['filename'], flush=True)
             try:
-                with opener.open(secure_url, timeout=60) as response, partial.open('xb') as output:
-                    copy_bounded(response, output, p['size'])
+                if downloader == 'aria2':
+                    program = shutil.which('aria2c')
+                    require(program is not None, 'aria2c is required for --downloader aria2')
+                    command = [program, '--no-conf', '--no-netrc=true', '--check-certificate=true',
+                               '--max-connection-per-server=16', '--split=16', '--min-split-size=8M',
+                               '--continue=true', '--auto-file-renaming=false', '--allow-overwrite=false',
+                               '--summary-interval=0', '--console-log-level=error', '--download-result=hide',
+                               '--enable-color=false', '--max-tries=3', '--retry-wait=5',
+                               '--checksum=sha-256=' + p['sha256'], '--dir=' + str(destination.resolve()),
+                               '--out=' + partial.name, source_url]
+                    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    if result.returncode:
+                        raise ValueError(f'aria2 refused/failed the original download (exit {result.returncode}); temporary URLs omitted')
+                else:
+                    payload_request = urllib.request.Request(source_url, headers={'User-Agent': 'aria2/1.37.0'})
+                    with opener.open(payload_request, timeout=60) as response, partial.open('xb') as output:
+                        require(response.status == 200, 'Full package request must return HTTP 200')
+                        copy_bounded(response, output, p['size'])
                 check_file(partial, p)
                 partial.rename(path)
             except urllib.error.HTTPError as error:
                 partial.unlink(missing_ok=True)
                 # HTTPError may embed the signed URL; report only the status.
-                raise ValueError(f'Microsoft HTTPS delivery returned HTTP {error.code}; no HTTP fallback') from None
+                raise ValueError(f'Original Microsoft delivery URL returned HTTP {error.code}; URL query omitted') from None
             except Exception:
-                partial.unlink(missing_ok=True)
-                raise ValueError('Package acquisition failed; no HTTP fallback and temporary URLs are omitted') from None
-        results.append({'filename': p['filename'], **check_file(path, p)})
+                if downloader == 'python':
+                    partial.unlink(missing_ok=True)
+                raise ValueError('Package acquisition failed; source was not rewritten and temporary URLs are omitted') from None
+        results.append({'filename': p['filename'], 'transport': urllib.parse.urlsplit(source_url).scheme,
+                        'origin': p['source_host'], **check_file(path, p)})
     require(results, 'No locked packages selected')
     return results
 
@@ -239,16 +278,17 @@ def main():
     parser.add_argument("--require-build-ready", action="store_true")
     parser.add_argument("--destination", type=Path)
     parser.add_argument("--only-enablement", action="store_true")
+    parser.add_argument("--downloader", choices=('python', 'aria2'), default='python')
     args = parser.parse_args()
     try:
-        m = validate(json.loads(args.manifest.read_text(encoding="utf-8")), args.require_build_ready)
+        m = validate(json.loads(args.manifest.read_text(encoding="utf-8-sig")), args.require_build_ready)
         if args.command == "acquire-base":
             require(args.destination is not None, "--destination is required")
             actual = acquire_base(m, args.destination)
             print(json.dumps({"integrity": "matches upstream mirror lock", "microsoft_provenance": "not independently verified", **actual}, indent=2))
         elif args.command == "acquire-packages":
             require(args.destination is not None, "--destination is required")
-            print(json.dumps(acquire_packages(m, args.destination, args.only_enablement), indent=2))
+            print(json.dumps(acquire_packages(m, args.destination, args.only_enablement, args.downloader), indent=2))
         else:
             print(json.dumps({"valid": True, "status": m["status"], "build_ready": args.require_build_ready}))
     except (ValueError, KeyError, TypeError, OSError, zipfile.BadZipFile) as error:

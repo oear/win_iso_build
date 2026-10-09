@@ -48,7 +48,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Windows PowerShell 5.1 smoke check failed.' }
           & pwsh -NoProfile -File audit/parse.ps1
           if ($LASTEXITCODE -ne 0) { throw 'PowerShell 7 smoke check failed.' }
-      - name: Acquire EKB over validated HTTPS or verify an owner supplied locked cache
+      - name: Acquire the original hash-pinned UUP EKB or verify a locked cache
         shell: pwsh
         env:
           VERIFIED_EKB_BASE64: ${{ secrets.LTSC_AUDIT_EKB_BASE64 }}
@@ -62,7 +62,7 @@ jobs:
             @{ source = 'owner-supplied hash-pinned audit input; network acquisition not tested in this run'; sha256 = $sha } |
               ConvertTo-Json | Set-Content audit/payload-source.json -Encoding UTF8
           }
-          python experimental/prepare.py acquire-packages --only-enablement --destination audit/packages
+          python experimental/prepare.py acquire-packages --only-enablement --downloader aria2 --destination audit/packages
       - name: Check actual Microsoft catalogs under Windows default trust
         shell: pwsh
         run: |
