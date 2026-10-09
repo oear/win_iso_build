@@ -2,6 +2,9 @@ name: Experimental LTSC source and Windows audit
 
 on:
   workflow_dispatch:
+  push:
+    branches: [experimental/ltsc-26340.9616]
+    paths: ['experimental/**', 'tests/**', '.github/workflows/experimental_ltsc_audit.yml']
 
 permissions:
   contents: read

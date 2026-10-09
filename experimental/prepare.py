@@ -105,6 +105,18 @@ def check_file(path, locked):
     return actual
 
 
+def copy_bounded(source, output, expected_size):
+    copied = 0
+    while True:
+        chunk = source.read(min(4 * 1024 * 1024, expected_size - copied + 1))
+        if not chunk:
+            break
+        require(copied + len(chunk) <= expected_size, 'Response exceeds locked size')
+        output.write(chunk)
+        copied += len(chunk)
+    require(copied == expected_size, 'Response is shorter than locked size')
+
+
 class CheckedRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         parsed = urllib.parse.urlsplit(newurl)
@@ -151,7 +163,7 @@ def acquire_packages(m, destination, only_enablement=False):
             print('Downloading ' + p['filename'], flush=True)
             try:
                 with opener.open(secure_url, timeout=60) as response, partial.open('xb') as output:
-                    shutil.copyfileobj(response, output, 4 * 1024 * 1024)
+                    copy_bounded(response, output, p['size'])
                 check_file(partial, p)
                 partial.rename(path)
             except urllib.error.HTTPError as error:
@@ -186,7 +198,7 @@ def acquire_base(m, destination):
             print("Downloading " + part["filename"], flush=True)
             try:
                 with opener.open(url, timeout=60) as response, partial.open("xb") as output:
-                    shutil.copyfileobj(response, output, 4 * 1024 * 1024)
+                    copy_bounded(response, output, part['size'])
                 check_file(partial, part)
                 partial.rename(path)
             except Exception:
@@ -199,7 +211,7 @@ def acquire_base(m, destination):
         with archive.open("xb") as output:
             for part in base["parts"]:
                 with (destination / part["filename"]).open("rb") as source:
-                    shutil.copyfileobj(source, output, 4 * 1024 * 1024)
+                    copy_bounded(source, output, part['size'])
         partial_iso = iso.with_suffix(".iso.partial")
         require(not partial_iso.exists(), "ISO partial already exists")
         with zipfile.ZipFile(archive) as z:
@@ -207,7 +219,7 @@ def acquire_base(m, destination):
             info = z.getinfo(base["filename"])
             require(info.file_size == base["size"], "Unexpected uncompressed ISO size")
             with z.open(info) as source, partial_iso.open("xb") as output:
-                shutil.copyfileobj(source, output, 4 * 1024 * 1024)
+                copy_bounded(source, output, base['size'])
         actual = check_file(partial_iso, base)
         partial_iso.rename(iso)
         return actual

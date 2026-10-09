@@ -1,5 +1,6 @@
 import copy
 import importlib.util
+import io
 import json
 import tempfile
 import unittest
@@ -62,6 +63,14 @@ class LockSafetyTests(unittest.TestCase):
                 lock['base_iso']['official_hash_verified'] = value
                 with self.assertRaises(ValueError):
                     prepare.validate(lock)
+
+    def test_streaming_download_rejects_excess_or_short_payload(self):
+        for data in [b'1234', b'12']:
+            with self.subTest(data=data), self.assertRaises(ValueError):
+                prepare.copy_bounded(io.BytesIO(data), io.BytesIO(), 3)
+        destination = io.BytesIO()
+        prepare.copy_bounded(io.BytesIO(b'123'), destination, 3)
+        self.assertEqual(destination.getvalue(), b'123')
 
     def test_tampered_or_truncated_bytes_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -47,12 +47,12 @@ foreach ($value in @($BaseIso, $PackageDirectory, $WorkDirectory, $OscdimgPath))
 $BaseIso = (Resolve-Path -LiteralPath $BaseIso).ProviderPath
 $PackageDirectory = (Resolve-Path -LiteralPath $PackageDirectory).ProviderPath
 $OscdimgPath = (Resolve-Path -LiteralPath $OscdimgPath).ProviderPath
-$WorkDirectory = [IO.Path]::GetFullPath($WorkDirectory)
+$WorkDirectory = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($WorkDirectory)
 if (Test-Path -LiteralPath $WorkDirectory) { throw 'WorkDirectory must be a new directory; existing work is never overwritten.' }
 if ((Get-FileHash -LiteralPath $BaseIso -Algorithm SHA256).Hash.ToLowerInvariant() -ne $manifest.base_iso.sha256 -or
     (Get-Item -LiteralPath $BaseIso).Length -ne $manifest.base_iso.size) { throw 'Base ISO integrity mismatch.' }
 $toolSignature = Get-AuthenticodeSignature -LiteralPath $OscdimgPath
-if ($toolSignature.Status -ne 'Valid' -or $toolSignature.SignerCertificate.Subject -notmatch 'O=Microsoft Corporation(?:,|$)') {
+if ($toolSignature.Status -ne 'Valid' -or $toolSignature.SignerCertificate.Subject -notmatch '(^|,\s*)O=Microsoft Corporation(,|$)') {
     throw 'oscdimg must have a valid Microsoft Authenticode signature (Microsoft ADK).'
 }
 $disk = Get-DiskImage -ImagePath $BaseIso
@@ -209,8 +209,8 @@ try {
     & $OscdimgPath -m -o -u2 -udfver102 -lLTSC_EXPERIMENTAL ('-bootdata:2#p0,e,b' + $bios + '#pEF,e,b' + $uefi) $media $pendingIso 2>&1 |
         Out-File -LiteralPath (Join-Path $logs 'oscdimg.txt') -Encoding UTF8
     if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $pendingIso)) { throw 'oscdimg failed.' }
+    $report.iso_sha256 = (Get-FileHash -LiteralPath $pendingIso -Algorithm SHA256).Hash.ToLowerInvariant()
     Move-Item -LiteralPath $pendingIso -Destination $outputIso
-    $report.iso_sha256 = (Get-FileHash -LiteralPath $outputIso -Algorithm SHA256).Hash.ToLowerInvariant()
     $report.status = 'offline-image-verified-runtime-pending'
     Write-Output $outputIso
 } catch {
@@ -218,14 +218,17 @@ try {
     $report.errors += $_.Exception.Message
     throw
 } finally {
+    $cleanupFailed = $false
     if ($wimMounted) {
         try { Dismount-WindowsImage -Path $mount -Discard | Out-Null }
-        catch { $report.errors += ('Discard mount failed; inspect manually: ' + $_.Exception.Message) }
+        catch { $cleanupFailed = $true; $report.errors += ('Discard mount failed; inspect manually: ' + $_.Exception.Message) }
     }
     if ($isoMounted) {
         try { Dismount-DiskImage -ImagePath $BaseIso | Out-Null }
-        catch { $report.errors += ('ISO detach failed: ' + $_.Exception.Message) }
+        catch { $cleanupFailed = $true; $report.errors += ('ISO detach failed: ' + $_.Exception.Message) }
     }
     $report.finished_utc = [DateTime]::UtcNow.ToString('o')
+    if ($cleanupFailed) { $report.status = 'cleanup-incomplete' }
     $report | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $logs 'build-report.json') -Encoding UTF8
+    if ($cleanupFailed) { throw 'Mount cleanup incomplete. Inspect build-report.json and the host mounts before continuing.' }
 }
