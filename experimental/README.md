@@ -4,6 +4,8 @@
 
 **当前状态：research。已实现构建驱动，尚未证明可原生集成，也没有通过安装验收的 ISO。** 它不属于微软支持的 LTSC 版本。微软正式 LTSC 2024 是 24H2/26100 系列；不要把本项目的输出用于主力系统。
 
+2026-10-09 实测：作者完整 ISO 哈希与固定参照一致，WIM 唯一索引是 `EnterpriseS/x64/zh-CN/26100.1742`。[Windows 审计](https://github.com/oear/win_iso_build/actions/runs/37918088811)通过 8 项输入检查、PowerShell 5.1/7 解析与研究锁拒绝行为；使用此前通过 HTTPS 核验的 CAB 缓存，3 个 EKB CAT 均为默认信任认可的微软签名。它不是 LTSC 安装后的信任结果，也未检查 CAT 的 payload 成员关系。随后获取 KB5122055 检查点的有效证书 HTTPS 路径仍返回 403；完整在线获取、DISM 集成、安装与网络验收尚未完成。见 `evidence/verification-status.json`。临时缓存输入已删除，原始 ISO 只读挂载已卸载。
+
 ## 已确认与仍需确认
 
 - [Microsoft 2026-10-07 公告](https://blogs.windows.com/windows-insider/2026/10/07/announcing-new-builds-for-7-october-2026/)及[官方发布说明](https://learn.microsoft.com/en-us/windows-insider/release-notes/experimental/preview-build-26340-9616)确认 Experimental 26340.9616。

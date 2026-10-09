@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-09",
+  "target": "26340.9616 / EnterpriseS / zh-CN / x64",
+  "source_code_commit": "59fdebbe7885801e92d554a9a1629a59a59c23dd",
+  "windows_audit_url": "https://github.com/oear/win_iso_build/actions/runs/37918088811",
+  "windows_host": "GitHub windows-2025; not an installed LTSC test machine",
+  "tests": {
+    "input_safety_tests": 8,
+    "python_tests": "passed",
+    "powershell_5_1_parser_and_gate": "passed",
+    "powershell_7_parser_and_gate": "passed",
+    "microsoft_catalog_default_trust": "passed for 3 EKB CATs using a hash-pinned cached input",
+    "base_iso_full_sha256": "matches upstream lock",
+    "base_iso_wim_metadata": "EnterpriseS/x64/zh-CN/26100.1742, one index"
+  },
+  "remaining": {
+    "stable_online_package_download": "unresolved; Microsoft HTTPS CDN 403 for EKB and KB5122055 on fresh URLs",
+    "full_MSU_payload_and_signature_validation": "not run",
+    "actual_LTSC_DISM_applicability": "not run",
+    "offline_integration": "not run",
+    "VM_install_and_boot": "not run",
+    "ACL_and_Explorer_New": "collector prepared, runtime not run",
+    "Windows_Update": "checklist prepared, runtime not run",
+    "Reality_sing_box": "checklist prepared, runtime not run"
+  },
+  "safety": {
+    "temporary_audit_input_deleted": true,
+    "base_iso_readonly_mount_detached": true,
+    "upstream_written": false,
+    "formal_workflow_and_matrix_changed": false,
+    "activation_or_trust_bypass": false
+  },
+  "final_iso_available": false
+}
