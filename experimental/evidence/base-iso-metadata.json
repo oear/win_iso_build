@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "collected_at_utc": "2026-10-09T10:27:57.834555+00:00",
+  "file": {
+    "relative_path": "work/base-mounted/sources/install.wim",
+    "size": 4407696510,
+    "sha256": "9ed04f772af866b27d809754859e1f36bbe16a856f88b037d70d25b930c57cc2",
+    "same_size_mtime_inode_after_read": true
+  },
+  "method": "Read-only Python binary reads of the standard 208-byte WIM header and uncompressed UTF-16 XML resource; parsed XML with ElementTree; no image mount/apply/servicing or Windows executables were run.",
+  "filesystem_mount_observed": "udf, local, nodev, nosuid, read-only, noowners, nobrowse",
+  "format_references": [
+    {
+      "url": "https://raw.githubusercontent.com/ebiggers/wimlib/master/include/wimlib/header.h",
+      "fields_used": "wim_header_disk: 208 bytes; image_count offset 0x2c; xml_data_reshdr offset 0x48"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ebiggers/wimlib/master/include/wimlib/resource.h",
+      "fields_used": "wim_reshdr_disk: 7-byte size, 1-byte flags, 8-byte offset, 8-byte uncompressed size; compressed flag 0x04; solid flag 0x10"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/ns-sysinfoapi-system_info",
+      "fields_used": "PROCESSOR_ARCHITECTURE_AMD64 = 9"
+    }
+  ],
+  "header": {
+    "magic_hex": "4d5357494d000000",
+    "header_size": 208,
+    "format_version_hex": "0x10d00",
+    "flags_hex": "0x40082",
+    "chunk_size": 32768,
+    "part_number": 1,
+    "total_parts": 1,
+    "image_count": 1
+  },
+  "xml_resource": {
+    "offset": 4407693734,
+    "stored_size": 2776,
+    "uncompressed_size": 2776,
+    "flags_hex": "0x2",
+    "sha256": "3bcf45899546606ee4be3bc9e9d70d51b9ad788d57c15ca526f5cbb3a477a7ed",
+    "encoding": "UTF-16 LE with BOM",
+    "raw_xml_decoded": "<WIM><TOTALBYTES>4407693734</TOTALBYTES><IMAGE INDEX=\"1\"><DIRCOUNT>24545</DIRCOUNT><FILECOUNT>100919</FILECOUNT><TOTALBYTES>18804141448</TOTALBYTES><HARDLINKBYTES>8908544124</HARDLINKBYTES><CREATIONTIME><HIGHPART>0x01DB0016</HIGHPART><LOWPART>0x3D9551C3</LOWPART></CREATIONTIME><LASTMODIFICATIONTIME><HIGHPART>0x01DB0019</HIGHPART><LOWPART>0x48526162</LOWPART></LASTMODIFICATIONTIME><WIMBOOT>0</WIMBOOT><WINDOWS><ARCH>9</ARCH><PRODUCTNAME>Microsoft® Windows® Operating System</PRODUCTNAME><EDITIONID>EnterpriseS</EDITIONID><INSTALLATIONTYPE>Client</INSTALLATIONTYPE><SERVICINGDATA><GDRDUREVISION>0</GDRDUREVISION><PKEYCONFIGVERSION>10.0.26100.1;2016-01-01T00:00:00Z</PKEYCONFIGVERSION><IMAGESTATE>IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE</IMAGESTATE></SERVICINGDATA><PRODUCTTYPE>WinNT</PRODUCTTYPE><PRODUCTSUITE>Terminal Server</PRODUCTSUITE><LANGUAGES><LANGUAGE>zh-CN</LANGUAGE><FALLBACK LANGUAGE=\"zh-CN\">en-US</FALLBACK><DEFAULT>zh-CN</DEFAULT></LANGUAGES><VERSION><MAJOR>10</MAJOR><MINOR>0</MINOR><BUILD>26100</BUILD><SPBUILD>1742</SPBUILD><SPLEVEL>0</SPLEVEL><BRANCH>ge_release</BRANCH></VERSION><SYSTEMROOT>WINDOWS</SYSTEMROOT></WINDOWS><NAME>Windows 11 Enterprise LTSC 2024</NAME><DESCRIPTION>Windows 11 Enterprise LTSC 2024</DESCRIPTION><FLAGS>EnterpriseS</FLAGS><DISPLAYNAME>Windows 11 企业版 LTSC</DISPLAYNAME><DISPLAYDESCRIPTION>Windows 11 企业版 LTSC</DISPLAYDESCRIPTION></IMAGE></WIM>"
+  },
+  "images": [
+    {
+      "index": 1,
+      "labels": {
+        "NAME": "Windows 11 Enterprise LTSC 2024",
+        "DESCRIPTION": "Windows 11 Enterprise LTSC 2024",
+        "FLAGS": "EnterpriseS",
+        "DISPLAYNAME": "Windows 11 企业版 LTSC",
+        "DISPLAYDESCRIPTION": "Windows 11 企业版 LTSC"
+      },
+      "edition_id": "EnterpriseS",
+      "installation_type": "Client",
+      "architecture_code": 9,
+      "architecture_interpretation": "AMD64/x64",
+      "languages": [
+        "zh-CN"
+      ],
+      "default_language": "zh-CN",
+      "language_fallbacks": [
+        {
+          "for_language": "zh-CN",
+          "fallback": "en-US"
+        }
+      ],
+      "version": {
+        "MAJOR": "10",
+        "MINOR": "0",
+        "BUILD": "26100",
+        "SPBUILD": "1742",
+        "SPLEVEL": "0",
+        "BRANCH": "ge_release"
+      },
+      "build_revision": "26100.1742",
+      "servicing_data": {
+        "GDRDUREVISION": "0",
+        "PKEYCONFIGVERSION": "10.0.26100.1;2016-01-01T00:00:00Z",
+        "IMAGESTATE": "IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE"
+      },
+      "evaluation_marker_in_metadata": false,
+      "evaluation_marker_fields": [],
+      "expected_target_metadata_matches": true
+    }
+  ],
+  "observations": [
+    "There is exactly one image index: EnterpriseS / AMD64-x64 / zh-CN / Windows 11 Enterprise LTSC 2024.",
+    "WIM XML VERSION records 10.0.26100.1742, while PKEYCONFIGVERSION records 10.0.26100.1. These are distinct metadata fields; do not treat the PKEY config version as the current image build.",
+    "The Experimental UUP dependency baseline in evidence/uup-evidence.json is 10.0.26100.6 and checkpoint target 10.0.26100.1746, different from this ISO XML revision 1742. Applicability to this exact LTSC image still requires Windows DISM/package-state checks.",
+    "No Eval string or evaluation EditionID was found in the image labels/FLAGS/EDITIONID. This is metadata evidence, not an independent license or activation determination.",
+    "Metadata parsing and a file hash do not authenticate Microsoft provenance or establish package applicability, signature trust, runtime ACL behavior, Windows Update compatibility, or support status."
+  ]
+}

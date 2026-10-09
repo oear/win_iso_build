@@ -29,7 +29,7 @@ python experimental/prepare.py acquire-base --destination C:\LTSC-input\base
 python experimental/prepare.py acquire-packages --only-enablement --destination C:\LTSC-input\ekb
 ```
 
-获取器不会运行下载内容。UUP 的临时签名 URL 只在内存中使用。它把原始 path/query 映射到 `https://catalog.sf.dl.delivery.mp.microsoft.com`，保持 TLS 证书校验，再核对锁定 SHA256/SHA1/大小。小 EKB 的等价 HTTPS 字节已验证；其他包可能返回 403，遇到拒绝或哈希漂移直接停止，不回退 HTTP、不关闭证书校验。
+获取器不会运行下载内容。UUP 的临时签名 URL 只在内存中使用。它把原始 path/query 映射到 `https://catalog.sf.dl.delivery.mp.microsoft.com`，保持 TLS 证书校验，再核对锁定 SHA256/SHA1/大小。小 EKB 的等价 HTTPS 字节曾验证成功，但随后本机和 Windows 云端都遇到 403，**此机制尚不稳定，在线下载链尚未验证可完整重现**。遇到拒绝或哈希漂移直接停止，不回退 HTTP、不关闭证书校验。已取得的本地缓存可在相同目标目录按锁定哈希重新验证后使用。
 
 ```powershell
 .\experimental\Inspect-EnablementPackage.ps1 `
@@ -37,7 +37,7 @@ python experimental/prepare.py acquire-packages --only-enablement --destination 
   -OutputDirectory C:\LTSC-evidence\ekb-unique
 ```
 
-此命令只展开 CAB、读取 MUM 和检查 CAT。默认信任若拒绝，报告保留失败；不得导入开发根、修改 flight signing 或打开 testsigning。有效 CAT 签名仍不等于整个包可服务 LTSC。GitHub 手动 `Experimental LTSC source and Windows audit` 工作流运行相同检查，权限只有 `contents: read`，并保留失败证据。
+此命令只展开 CAB、读取 MUM 和检查 CAT。默认信任若拒绝，报告保留失败；不得导入开发根、修改 flight signing 或打开 testsigning。有效 CAT 签名仍不等于整个包可服务 LTSC。GitHub `Experimental LTSC source and Windows audit` 工作流可手动运行，也会在实验分支 push 时运行，权限只有 `contents: read`，并保留失败证据。仓库所有者可通过临时 `LTSC_AUDIT_EKB_BASE64` secret 提供此前核验的小 CAB 缓存用于信任审计；它必须匹配同一锁定 SHA256，审计后删除该临时输入。这类运行会单独记录缓存来源，不能作为在线下载成功的证据。
 
 ## 原生离线试构建入口
 

@@ -13,3 +13,7 @@
 .gitattributes     export-ignore
 .gitignore         export-ignore
 .github/           export-ignore
+
+# Preserve downloaded metadata evidence bytes; never use normalized MUMs to service.
+experimental/evidence/*.xml -text
+experimental/evidence/*.mum -text

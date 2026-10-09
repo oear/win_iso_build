@@ -48,8 +48,21 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Windows PowerShell 5.1 smoke check failed.' }
           & pwsh -NoProfile -File audit/parse.ps1
           if ($LASTEXITCODE -ne 0) { throw 'PowerShell 7 smoke check failed.' }
-      - name: Acquire the small EKB over validated HTTPS only
-        run: python experimental/prepare.py acquire-packages --only-enablement --destination audit/packages
+      - name: Acquire EKB over validated HTTPS or verify an owner supplied locked cache
+        shell: pwsh
+        env:
+          VERIFIED_EKB_BASE64: ${{ secrets.LTSC_AUDIT_EKB_BASE64 }}
+        run: |
+          if ($env:VERIFIED_EKB_BASE64) {
+            New-Item -ItemType Directory -Path audit/packages | Out-Null
+            $path = Join-Path (Get-Location) 'audit/packages/Windows11.0-KB5122776-x64.cab'
+            [IO.File]::WriteAllBytes($path, [Convert]::FromBase64String($env:VERIFIED_EKB_BASE64))
+            $sha = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($sha -ne 'fcf1101ccc6de263c894768160e0f02695526924a0a7665933c5e9843f64e737') { throw 'Owner supplied EKB cache does not match the locked payload.' }
+            @{ source = 'owner-supplied hash-pinned audit input; network acquisition not tested in this run'; sha256 = $sha } |
+              ConvertTo-Json | Set-Content audit/payload-source.json -Encoding UTF8
+          }
+          python experimental/prepare.py acquire-packages --only-enablement --destination audit/packages
       - name: Check actual Microsoft catalogs under Windows default trust
         shell: pwsh
         run: |
@@ -63,5 +76,6 @@ jobs:
             audit/enablement/*.json
             audit/enablement/*.log
             audit/parse.ps1
+            audit/payload-source.json
           if-no-files-found: warn
           retention-days: 30

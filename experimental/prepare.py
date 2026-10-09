@@ -132,6 +132,11 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def acquire_packages(m, destination, only_enablement=False):
+    selected = [p for p in m['packages'] if not only_enablement or p['role'] == 'enablement']
+    require(selected, 'No locked packages selected')
+    if all((destination / p['filename']).exists() for p in selected):
+        require(not destination.is_symlink(), 'Destination cannot be a symlink')
+        return [{'filename': p['filename'], 'source': 'verified-local-cache', **check_file(destination / p['filename'], p)} for p in selected]
     # Fetch fresh expiring URLs into memory. Never persist or print their query.
     api = 'https://api.uupdump.net/get.php?' + urllib.parse.urlencode({
         'id': m['uup']['id'], 'pack': 0, 'edition': 0})
@@ -143,9 +148,7 @@ def acquire_packages(m, destination, only_enablement=False):
     destination.mkdir(parents=True, exist_ok=True)
     require(not destination.is_symlink(), 'Destination cannot be a symlink')
     results = []
-    for p in m['packages']:
-        if only_enablement and p['role'] != 'enablement':
-            continue
+    for p in selected:
         indexed = payload['files'][p['filename']]
         for key in ('sha256', 'sha1', 'size'):
             require(str(indexed[key]) == str(p[key]), 'UUP metadata drift for ' + p['filename'])
