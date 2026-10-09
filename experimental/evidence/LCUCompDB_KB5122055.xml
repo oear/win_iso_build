@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CompDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" CreatedDate="2026-07-22T16:40:14.5093509Z" Revision="1" SchemaVersion="1.2" Product="Desktop" BuildID="00000000-0000-0000-0000-000000000000" BuildInfo="ge_release_flt.26100.6.260716-1700" OSVersion="10.0.26100.6" BuildArch="amd64" Type="BuildUpdate" TargetBuildID="00000000-0000-0000-0000-000000000000" TargetBuildInfo="ge_release_svc_flt.26100.1746.260719-1830" TargetOSVersion="10.0.26100.1746" xmlns="http://schemas.microsoft.com/embedded/2004/10/ImageUpdate">
+  <Tags Type="PSFXv2">
+    <Tag Name="UpdateType" Value="Canonical" />
+  </Tags>
+  <Features>
+    <Feature Type="CumulativeUpdate" FeatureID="CumulativeUpdate_KB5122055" FMID="MSDN" Group="Microsoft">
+      <Packages>
+        <Package ID="Package_for_RollupFix~~amd64~~26100.1746.1.3" PackageType="BaselinePackage" />
+      </Packages>
+    </Feature>
+  </Features>
+  <MSConditionalFeatures>
+    <ConditionalFeature UpdateAction="Add" FeatureID="CumulativeUpdate_KB5122055" FMID="MSDN">
+      <Condition Type="PackageAnyVersion" Status="NotInstalled" Name="WinPE-Rejuv-Package~31bf3856ad364e35~amd64~~" />
+    </ConditionalFeature>
+  </MSConditionalFeatures>
+  <Packages>
+    <Package ID="Package_for_RollupFix~~amd64~~26100.1746.1.3" InstalledSize="9999999999" Version="26100.1746.1.3">
+      <Payload>
+        <PayloadItem PayloadHash="p0HOc4cmNHoF1mPQtfkcstOHFZo5gvvXwoN/xNUnJIU=" PayloadSize="124183435" Path="Windows11.0-KB5122055-x64.wim" PayloadType="ExpressCab" AltSourceName="Windows11.0-KB5122055-x64.msu" AltSourceHash="Hvp99tLXM1M+XZEr/3XbgXFWsq8W6Spn0WZo/9aVv+8=" />
+        <PayloadItem PayloadHash="kBdAPLg1xEVXzt9VjrJEnSg9B2cFvVMZhZtlw3dijfs=" PayloadSize="729992397" Path="Windows11.0-KB5122055-x64.psf" PayloadType="ExpressPSF" AltSourceName="Windows11.0-KB5122055-x64.msu" AltSourceHash="Hvp99tLXM1M+XZEr/3XbgXFWsq8W6Spn0WZo/9aVv+8=" />
+      </Payload>
+      <CustomInformation>
+        <PayloadIntentItem PayloadIntent="PSFX_V2" />
+      </CustomInformation>
+    </Package>
+  </Packages>
+</CompDB>

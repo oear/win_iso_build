@@ -1,0 +1,522 @@
+{
+  "apiVersion": "I can't be bothered to update the version; use commit hash.",
+  "updateName": "Windows 11 Insider Preview Feature Update (26340.9616)",
+  "arch": "amd64",
+  "build": "26340.9616",
+  "sku": 48,
+  "hasUpdates": false,
+  "appxPresent": false,
+  "files": {
+    "398e3bc2-9c3f-4d87-b40b-e54a46826056.AggregatedMetadata.cab": {
+      "sha1": "529609fdd5f3813378b7f451a560a9569db4be27",
+      "sha256": "8e449a5ff640144106b50f671f98ec0c735e158de8d8ad8b677a6eead8820a67",
+      "size": "3092443",
+      "uuid": "e4a71605-77f7-4343-85c6-4141a5c3b027",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/e4a71605-77f7-4343-85c6-4141a5c3b027"
+    },
+    "DesktopDeployment.cab": {
+      "sha1": "434e4e446e9ba7714d0024a36e5a19d2e70fd2cb",
+      "sha256": "6c871c189634c67923f56f34bc4db42f0f5cb9950663e3639b0ff5dbcb4e09fe",
+      "size": "11628998",
+      "uuid": "0a675ed6-f1a3-46cf-a37b-4625d0dea785",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/0a675ed6-f1a3-46cf-a37b-4625d0dea785"
+    },
+    "Windows11.0-KB5122055-x64.msu": {
+      "sha1": "9e0f01624159b4ca5a1ae162e01f34f7835fc606",
+      "sha256": "1efa7df6d2d733533e5d912bff75db817156b2af16e92a67d16668ffd695bfef",
+      "size": "886899629",
+      "uuid": "d9944a32-ee29-4019-b964-581eca214308",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/d9944a32-ee29-4019-b964-581eca214308"
+    },
+    "Windows11.0-KB5122776-x64-baseless.cab": {
+      "sha1": "f5df25b7499466fc9a3de60d97f4e4cfa413e606",
+      "sha256": "f54062ad6e37b29643e298dde2d058d416fdec742bb11d379707a2c09a5508ba",
+      "size": "26138",
+      "uuid": "e5f440ab-0d45-431f-ab4b-1dddcaf05f83",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/e5f440ab-0d45-431f-ab4b-1dddcaf05f83"
+    },
+    "Windows11.0-KB5122776-x64-baseless.psf": {
+      "sha1": "e2e98e660e58959cddec8b26dd60948a84339d19",
+      "sha256": "9a7237d223bc47bb9e30bcaba98eac29cffa54d7b88ac72bb084c6a7d7dd28b6",
+      "size": "43143",
+      "uuid": "53633ff5-bb18-4ef4-8862-60b8bafc58f6",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/53633ff5-bb18-4ef4-8862-60b8bafc58f6"
+    },
+    "Windows11.0-KB5122776-x64.cab": {
+      "sha1": "48ff373bb765d1e64b3b3987eccc19c3dbc46154",
+      "sha256": "fcf1101ccc6de263c894768160e0f02695526924a0a7665933c5e9843f64e737",
+      "size": "25866",
+      "uuid": "651f60c0-0ba9-45ff-90fa-c263793f91a6",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/651f60c0-0ba9-45ff-90fa-c263793f91a6"
+    },
+    "Windows11.0-KB5122776-x64.msu": {
+      "sha1": "5f8d90b01cefafca7089ea10d9c9d33861f540ff",
+      "sha256": "bc28d6027333cf93ef76e3521da24be74de58e54177d516f3415dfeb80dc1fed",
+      "size": "177467",
+      "uuid": "87b0c12b-7a6d-4f72-a5b2-8c50dff2e808",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/87b0c12b-7a6d-4f72-a5b2-8c50dff2e808"
+    },
+    "Windows11.0-KB5126054-x64-NDP481.cab": {
+      "sha1": "c9a8eb58e332a533c7e6cc33545ffbea63b4f91b",
+      "sha256": "3efebdd7464d921432d97798984588ff7723acd72636487000a0a98caf915122",
+      "size": "106855386",
+      "uuid": "2c07297c-514a-4e3c-9a1e-64c5801505da",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/2c07297c-514a-4e3c-9a1e-64c5801505da"
+    },
+    "Windows11.0-KB5127753-x64.msu": {
+      "sha1": "ded32c8f2cefe512c4e44e0732d8a302c86d0bd1",
+      "sha256": "4989c72091dab5487a4646081c334d713aa782b80b0b5a913f27dd600f946140",
+      "size": "4851429447",
+      "uuid": "3f9186ea-b18b-4ae5-ac67-3d68fb168dce",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/3f9186ea-b18b-4ae5-ac67-3d68fb168dce"
+    },
+    "Windows11.0-KB5128978-x64.cab": {
+      "sha1": "883a0015a944c1d3df7e6c4ddae0517a310ebac6",
+      "sha256": "c62e2850da959c1f2b055d08fcd1cfa5c75183c210aa7d0dbe139b6e723c99eb",
+      "size": "16124518",
+      "uuid": "6c9ec4f2-73e0-4f37-8714-c1a021676ecf",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/6c9ec4f2-73e0-4f37-8714-c1a021676ecf"
+    },
+    "Windows11.0-KB5131102-x64.cab": {
+      "sha1": "8b8a9ce3bb4a667f5e80aa741046bb64538dcec4",
+      "sha256": "344ce615627a3b34839ab1960b83176b2b77dbe66a20ddf11473feb4a86e124d",
+      "size": "409665263",
+      "uuid": "438c5a90-5ba1-4cfa-a4a3-85535529faf1",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/438c5a90-5ba1-4cfa-a4a3-85535529faf1"
+    },
+    "Windows11.0-KB5131102-x64.msu": {
+      "sha1": "f1ef264c2b7dc138e865839a3866027faeebf9aa",
+      "sha256": "30eff74e6404f72591ade475c887f91f07a90776ac266728487384fc710a7200",
+      "size": "409581234",
+      "uuid": "a9085118-fe8b-4219-86e7-1bb22eda9428",
+      "url_host": "tlu.dl.delivery.mp.microsoft.com",
+      "url_path": "/filestreamingservice/files/a9085118-fe8b-4219-86e7-1bb22eda9428"
+    }
+  },
+  "source_api": "https://api.uupdump.net/get.php?id=398e3bc2-9c3f-4d87-b40b-e54a46826056&pack=0&edition=0",
+  "retrieved_at": "2026-10-09",
+  "verification": {
+    "downloaded": [
+      "Windows11.0-KB5122776-x64.cab",
+      "398e3bc2-9c3f-4d87-b40b-e54a46826056.AggregatedMetadata.cab"
+    ],
+    "digest_check": "SHA256 matched HTTPS UUP dump API metadata; CAB source was exact HTTP Microsoft delivery URL from API",
+    "microsoft_catalog_signature": "not yet verified: macOS static extraction only",
+    "native_dism_applicability": "not yet verified: no Windows servicing host run",
+    "https_payload_verification": "KB5122776 CAB verified via HTTPS catalog.sf origin + original UUP temporary query; default certificate checks passed; identical SHA256",
+    "aggregated_metadata_https_verification": "Failed; see https-endpoint-evidence.json"
+  },
+  "enablement_manifest": {
+    "path": "work/ep-metadata/update.mum",
+    "displayName": "Feature Enablement for Windows (Ge) 26H2 Insider Refresh - KB5122776 - 2026.08 A - BuildNumber Update",
+    "packageIdentity": {
+      "name": "Package_for_KB5122776",
+      "version": "26100.9071.1.0",
+      "processorArchitecture": "amd64",
+      "language": "neutral",
+      "publicKeyToken": "31bf3856ad364e35"
+    },
+    "applicabilityEvaluation": "deep",
+    "parentRule": {
+      "buildCompare": "EQ",
+      "integrate": "separate",
+      "disposition": "detect"
+    },
+    "parentIdentities": [
+      {
+        "name": "Microsoft-Windows-CoreCountrySpecificEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-CoreEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-CoreNEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseEvalEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseGEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseSEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseSEvalEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseSNEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-EnterpriseSNEvalEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ProfessionalEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ProfessionalNEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerAzureStackHCICorEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterCorEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterEvalCorEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterEvalEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerDatacenterNanoEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerStandardCorEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerStandardEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerStandardEvalCorEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerStandardEvalEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerTurbineCorEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-ServerTurbineEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-UtilityVMEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-WinPE-Package",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-WinVOSEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      },
+      {
+        "name": "Microsoft-Windows-WNCEdition",
+        "version": "10.0.26100.6",
+        "processorArchitecture": "amd64",
+        "language": "neutral",
+        "buildType": "release",
+        "publicKeyToken": "31bf3856ad364e35"
+      }
+    ],
+    "cab_has_payload_mum_and_manifest": true,
+    "completelyOfflineCapable": "undetermined"
+  },
+  "compdb_facts": {
+    "DesktopTargetCompDB_BaseBuild.xml": {
+      "path": "work/agg-metadata/DesktopTargetCompDB_BaseBuild.xml",
+      "attributes": {
+        "SchemaVersion": "1.2",
+        "Product": "Desktop",
+        "BuildID": "9f739d16-2f4c-7d68-0250-e500b9bc1773",
+        "BuildInfo": "ge_release_flt.26100.6.260716-1700",
+        "OSVersion": "10.0.26100.6",
+        "BuildArch": "amd64",
+        "ReleaseType": "Production",
+        "Type": "BaseBuild",
+        "Name": "BaseBuild~amd64~Desktop~~"
+      }
+    },
+    "LCUCompDB_KB5122055.xml": {
+      "path": "work/agg-metadata/LCUCompDB_KB5122055.xml",
+      "attributes": {
+        "CreatedDate": "2026-07-22T16:40:14.5093509Z",
+        "Revision": "1",
+        "SchemaVersion": "1.2",
+        "Product": "Desktop",
+        "BuildID": "00000000-0000-0000-0000-000000000000",
+        "BuildInfo": "ge_release_flt.26100.6.260716-1700",
+        "OSVersion": "10.0.26100.6",
+        "BuildArch": "amd64",
+        "Type": "BuildUpdate",
+        "TargetBuildID": "00000000-0000-0000-0000-000000000000",
+        "TargetBuildInfo": "ge_release_svc_flt.26100.1746.260719-1830",
+        "TargetOSVersion": "10.0.26100.1746"
+      }
+    },
+    "LCUCompDB_KB5127753.xml": {
+      "path": "work/agg-metadata/LCUCompDB_KB5127753.xml",
+      "attributes": {
+        "CreatedDate": "2026-10-01T01:04:00.3448669Z",
+        "Revision": "1",
+        "SchemaVersion": "1.2",
+        "Product": "Desktop",
+        "BuildID": "00000000-0000-0000-0000-000000000000",
+        "BuildInfo": "ge_release_flt_upr.26100.1746.260723-0253",
+        "OSVersion": "10.0.26100.1746",
+        "BuildArch": "amd64",
+        "Type": "BuildUpdate",
+        "TargetBuildID": "00000000-0000-0000-0000-000000000000",
+        "TargetBuildInfo": "ge_prerelease_im.26100.9616.260929-2016",
+        "TargetOSVersion": "10.0.26100.9616"
+      }
+    },
+    "EKBUpdateCompDB_KB5122776.xml": {
+      "path": "work/agg-metadata/EKBUpdateCompDB_KB5122776.xml",
+      "attributes": {
+        "CreatedDate": "2026-07-31T16:38:29.6769182Z",
+        "Revision": "1",
+        "SchemaVersion": "1.2",
+        "Product": "Desktop",
+        "BuildID": "00000000-0000-0000-0000-000000000000",
+        "BuildInfo": "ge_release_flt.26100.6.260716-1700",
+        "OSVersion": "10.0.26100.6",
+        "BuildArch": "amd64",
+        "Type": "BuildUpdate",
+        "TargetBuildID": "00000000-0000-0000-0000-000000000000",
+        "TargetBuildInfo": "ge_prerelease_im.26100.9071.260730-1233",
+        "TargetOSVersion": "10.0.26100.9071",
+        "EKBTargetVersion": "10.0.26340.0"
+      }
+    },
+    "SSUCompDB_KB5122059.xml": {
+      "path": "work/agg-metadata/SSUCompDB_KB5122059.xml",
+      "attributes": {
+        "CreatedDate": "2026-07-21T01:11:38.801495Z",
+        "Revision": "1",
+        "SchemaVersion": "1.2",
+        "Product": "Desktop",
+        "BuildID": "00000000-0000-0000-0000-000000000000",
+        "BuildInfo": "ge_release_flt.26100.6.260716-1700",
+        "OSVersion": "10.0.26100.6",
+        "BuildArch": "amd64",
+        "Type": "BuildUpdate",
+        "TargetBuildID": "00000000-0000-0000-0000-000000000000",
+        "TargetBuildInfo": "ge_release_svc_flt.26100.1746.260719-1830",
+        "TargetOSVersion": "10.0.26100.1746"
+      }
+    },
+    "SSUCompDB_KB5127774.xml": {
+      "path": "work/agg-metadata/SSUCompDB_KB5127774.xml",
+      "attributes": {
+        "CreatedDate": "2026-09-30T16:53:29.4278975Z",
+        "Revision": "1",
+        "SchemaVersion": "1.2",
+        "Product": "Desktop",
+        "BuildID": "00000000-0000-0000-0000-000000000000",
+        "BuildInfo": "ge_release_flt.26100.6.260716-1700",
+        "OSVersion": "10.0.26100.6",
+        "BuildArch": "amd64",
+        "Type": "BuildUpdate",
+        "TargetBuildID": "00000000-0000-0000-0000-000000000000",
+        "TargetBuildInfo": "ge_prerelease_im.26100.9616.260929-2016",
+        "TargetOSVersion": "10.0.26100.9616"
+      }
+    },
+    "SetupDUCompDB_KB5128978.xml": {
+      "path": "work/agg-metadata/SetupDUCompDB_KB5128978.xml",
+      "attributes": {
+        "CreatedDate": "2026-09-11T15:48:09.9993728Z",
+        "Revision": "1",
+        "SchemaVersion": "1.2",
+        "Product": "Desktop",
+        "BuildID": "00000000-0000-0000-0000-000000000000",
+        "BuildInfo": "ge_release_flt.26100.6.260716-1700",
+        "OSVersion": "10.0.26100.6",
+        "BuildArch": "amd64",
+        "Type": "BuildUpdate",
+        "TargetBuildID": "00000000-0000-0000-0000-000000000000",
+        "TargetBuildInfo": "ge_prerelease_im.26100.9501.260910-1321",
+        "TargetOSVersion": "10.0.26100.9501"
+      }
+    },
+    "SafeOSDUCompDB_KB5131102.xml": {
+      "path": "work/agg-metadata/SafeOSDUCompDB_KB5131102.xml",
+      "attributes": {
+        "CreatedDate": "2026-09-30T19:38:27.8018544Z",
+        "Revision": "1",
+        "SchemaVersion": "1.2",
+        "Product": "Desktop",
+        "BuildID": "00000000-0000-0000-0000-000000000000",
+        "BuildInfo": "ge_release_flt.26100.6.260716-1700",
+        "OSVersion": "10.0.26100.6",
+        "BuildArch": "amd64",
+        "Type": "BuildUpdate",
+        "TargetBuildID": "00000000-0000-0000-0000-000000000000",
+        "TargetBuildInfo": "ge_prerelease_im.26100.9616.260929-2016",
+        "TargetOSVersion": "10.0.26100.9616"
+      }
+    }
+  },
+  "dependency_inference": {
+    "note": "Inference from downloaded Microsoft CompDB metadata, not proven servicing applicability",
+    "sequence": [
+      "KB5122055 (26100.6 -> 26100.1746)",
+      "KB5127753 (26100.1746 -> 26100.9616)",
+      "KB5122776 (EKBTargetVersion 26340.0; package 26100.9071.1.0)"
+    ],
+    "bundled_ssu": [
+      "KB5122059 / SSU-26100.1746-x64.cab inside KB5122055 MSU",
+      "KB5127774 / SSU-26100.9616-x64.cab inside KB5127753 MSU"
+    ],
+    "other_uup_update_roles": {
+      "KB5128978": "Setup Dynamic Update",
+      "KB5131102": "Safe OS Dynamic Update",
+      "KB5126054": "NDP481 .NET update (API filename; CompDB not extracted)"
+    }
+  },
+  "catalog_static_certificate_summary": "subject=C=US, ST=Washington, L=Redmond, O=Microsoft Corporation, CN=Microsoft Windows\nissuer=C=US, ST=Washington, L=Redmond, O=Microsoft Corporation, CN=Microsoft Development PCA 2014\n\nsubject=C=US, ST=Washington, L=Redmond, O=Microsoft Corporation, CN=Microsoft Development PCA 2014\nissuer=C=US, ST=Washington, L=Redmond, O=Microsoft Corporation, CN=Microsoft Development Root Certificate Authority 2014",
+  "catalog_static_certificate_note": "Certificate subject/issuer inspection only. The development signing chain is not proven trusted on LTSC by WinTrust. Do not import roots, enable testsigning, or bypass default DISM checks.",
+  "enablement_payload_observation": "The extracted canonical CAB manifest sets HKLM SYSTEM CurrentControlSet Control Version Kernel KVB=1, with a WRP registry security descriptor. It contains no observed C:\\Users filesystem ACL directives. This narrow observation does not rule out ACL bugs elsewhere or prove runtime behavior.",
+  "source_links": {
+    "insider_blog": "https://blogs.windows.com/windows-insider/2026/10/07/announcing-new-builds-for-7-october-2026/",
+    "insider_release_notes": "https://learn.microsoft.com/en-us/windows-insider/release-notes/experimental/preview-build-26340-9616",
+    "flight_hub": "https://learn.microsoft.com/en-us/windows-insider/flight-hub/",
+    "official_ltsc_overview": "https://learn.microsoft.com/en-us/windows/whats-new/ltsc/overview",
+    "official_ltsc_release_info": "https://learn.microsoft.com/en-us/windows/release-health/windows11-release-information",
+    "official_zh_cn_x64_eval_download_index": "https://www.microsoft.com/en-us/evalcenter/download-windows-11-enterprise",
+    "third_party_uup_update_index": "https://uupdump.net/findfiles.php?id=398e3bc2-9c3f-4d87-b40b-e54a46826056&q=!updates"
+  }
+}

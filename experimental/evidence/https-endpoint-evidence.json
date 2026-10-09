@@ -1,0 +1,25 @@
+[
+  {
+    "url": "https://dl.delivery.mp.microsoft.com/filestreamingservice/files/651f60c0-0ba9-45ff-90fa-c263793f91a6",
+    "exit_code": 60,
+    "error": "curl: (60) SSL: no alternative certificate subject name matches target host name 'dl.delivery.mp.microsoft.com'\nMore details here: https://curl.se/docs/sslcerts.html\n\ncurl failed to verify the legitimacy of the server and therefore could not\nestablish a secure connection to it. To learn more about this situation and\nhow to fix it, please visit the web page mentioned above.\n"
+  },
+  {
+    "url": "https://catalog.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/651f60c0-0ba9-45ff-90fa-c263793f91a6/public/48ff373bb765d1e64b3b3987eccc19c3dbc46154.cab",
+    "exit_code": 22,
+    "error": "curl: (22) The requested URL returned error: 404\n"
+  },
+  {
+    "url_mechanism": "UUP API original path and signed query; origin host changed to catalog.sf.dl.delivery.mp.microsoft.com; scheme changed to HTTPS; default TLS certificate validation",
+    "exit_code": 0,
+    "bytes": 25866,
+    "sha256": "fcf1101ccc6de263c894768160e0f02695526924a0a7665933c5e9843f64e737",
+    "matches_indexed_payload": true
+  },
+  {
+    "name": "398e3bc2-9c3f-4d87-b40b-e54a46826056.AggregatedMetadata.cab",
+    "url_mechanism": "UUP API original path and signed query; origin host changed to catalog.sf.dl.delivery.mp.microsoft.com; scheme changed to HTTPS; default TLS certificate validation",
+    "exit_code": 56,
+    "error": "curl: (56) The requested URL returned error: 403\n"
+  }
+]
