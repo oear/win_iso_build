@@ -13,6 +13,7 @@ import re
 import stat
 import sys
 from contextlib import contextmanager
+from functools import lru_cache
 from pathlib import Path
 
 MAX_PART_SIZE = 2000 * 1024 * 1024
@@ -44,7 +45,71 @@ def digest_value(value):
 
 
 def snapshot(info):
+    # Compare snapshots only from the same API (lstat -> lstat, fstat -> fstat).
+    # On Windows these APIs can expose different IDs/time representations.
     return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+
+def require_regular(info, name):
+    require(stat.S_ISREG(info.st_mode)
+            and not (getattr(info, "st_file_attributes", 0) & 0x400),
+            f"Not a regular, non-reparse file: {name}")
+
+
+@lru_cache(maxsize=1)
+def windows_api():
+    import ctypes
+    from ctypes import wintypes
+
+    class FileIdInfo(ctypes.Structure):
+        _fields_ = [("VolumeSerialNumber", ctypes.c_uint64), ("FileId", ctypes.c_ubyte * 16)]
+
+    class AttributeTagInfo(ctypes.Structure):
+        _fields_ = [("FileAttributes", wintypes.DWORD), ("ReparseTag", wintypes.DWORD)]
+
+    api = ctypes.WinDLL("kernel32", use_last_error=True)
+    api.GetFileInformationByHandleEx.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
+    api.GetFileInformationByHandleEx.restype = wintypes.BOOL
+    api.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                               ctypes.c_void_p, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    api.CreateFileW.restype = wintypes.HANDLE
+    api.CloseHandle.argtypes = [wintypes.HANDLE]
+    api.CloseHandle.restype = wintypes.BOOL
+    return api, FileIdInfo, AttributeTagInfo
+
+
+def windows_handle_identity(handle):
+    """Use the same Win32 128-bit file ID for both path and fd; fail closed."""
+    import ctypes
+    api, FileIdInfo, AttributeTagInfo = windows_api()
+    identity, attributes = FileIdInfo(), AttributeTagInfo()
+    # FileIdInfo = 18; FileAttributeTagInfo = 9 (FILE_INFO_BY_HANDLE_CLASS).
+    for kind, result in [(18, identity), (9, attributes)]:
+        if not api.GetFileInformationByHandleEx(handle, kind, ctypes.byref(result), ctypes.sizeof(result)):
+            raise ctypes.WinError(ctypes.get_last_error())
+    require(not (attributes.FileAttributes & (0x10 | 0x400)), "Directory or reparse-point handle rejected")
+    return identity.VolumeSerialNumber, bytes(identity.FileId)
+
+
+def file_identity(path=None, fd=None):
+    if os.name != "nt":
+        info = os.fstat(fd) if fd is not None else Path(path).lstat()
+        return info.st_dev, info.st_ino
+    import ctypes
+    import msvcrt
+    if fd is not None:
+        return windows_handle_identity(msvcrt.get_osfhandle(fd))
+    api, _, _ = windows_api()
+    # Metadata access only; OPEN_EXISTING and OPEN_REPARSE_POINT ensure that
+    # querying an identity never creates a file or silently follows a reparse.
+    handle = api.CreateFileW(str(Path(path).absolute()), 0, 0x7, None, 3,
+                             0x00200000 | 0x02000000, None)
+    if handle == ctypes.c_void_p(-1).value:
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        return windows_handle_identity(handle)
+    finally:
+        api.CloseHandle(handle)
 
 
 @contextmanager
@@ -52,16 +117,22 @@ def open_regular(path):
     """Reject symlinks, devices, directories, and changes during a read."""
     path = Path(path)
     before = path.lstat()
-    require(stat.S_ISREG(before.st_mode), f"Not a regular file: {path.name}")
+    require_regular(before, path.name)
+    before_identity = file_identity(path=path)
     flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
     fd = os.open(str(path), flags)
     with os.fdopen(fd, "rb") as source:
         opened = os.fstat(source.fileno())
-        require(stat.S_ISREG(opened.st_mode) and snapshot(opened) == snapshot(before),
+        require_regular(opened, path.name)
+        opened_identity = file_identity(fd=source.fileno())
+        require(snapshot(path.lstat()) == snapshot(before) and opened.st_size == before.st_size
+                and opened_identity == before_identity == file_identity(path=path),
                 f"File changed while opening: {path.name}")
         yield source, opened
         require(snapshot(os.fstat(source.fileno())) == snapshot(opened)
-                and snapshot(path.lstat()) == snapshot(opened),
+                and snapshot(path.lstat()) == snapshot(before)
+                and file_identity(fd=source.fileno()) == opened_identity
+                and file_identity(path=path) == before_identity,
                 f"File changed while reading: {path.name}")
 
 
@@ -92,20 +163,21 @@ def read_json(path):
 
 
 def remember_output(path, output, owned):
-    info = os.fstat(output.fileno())
-    owned.append((Path(path), info.st_dev, info.st_ino))
+    owned.append((Path(path), file_identity(fd=output.fileno())))
 
 
 def cleanup_outputs(owned):
     """Never remove an existing/unrecognized file or recursively erase a folder."""
-    for path, device, inode in reversed(owned):
+    for path, identity in reversed(owned):
         try:
             info = path.lstat()
-            if stat.S_ISREG(info.st_mode) and (info.st_dev, info.st_ino) == (device, inode):
+            if (stat.S_ISREG(info.st_mode)
+                    and not (getattr(info, "st_file_attributes", 0) & 0x400)
+                    and file_identity(path=path) == identity):
                 path.unlink()
         except FileNotFoundError:
             pass
-        except OSError:
+        except (OSError, ValueError):
             # An incomplete delivery never has a success return. Leave evidence
             # rather than deleting content whose ownership cannot be checked.
             pass

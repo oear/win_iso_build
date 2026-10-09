@@ -5,6 +5,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 
@@ -202,6 +203,84 @@ class PackageIsoTests(unittest.TestCase):
             self.assertEqual(package_iso.main(["split", "--iso", str(self.iso), "--destination", str(self.delivery), "--report", str(self.report)]), 0)
             self.assertEqual(len(split.call_args.args), 3)
         self.assertEqual(package_iso.MAX_PART_SIZE, 2097152000)
+
+    def test_path_and_fd_metadata_api_differences_are_not_mutation(self):
+        real_fstat = package_iso.os.fstat
+        def different_representation(fd):
+            info = real_fstat(fd)
+            return SimpleNamespace(st_mode=info.st_mode, st_dev=0, st_ino=0,
+                                   st_size=info.st_size,
+                                   st_mtime_ns=(info.st_mtime_ns // 1000000000) * 1000000000,
+                                   st_ctime_ns=info.st_ctime_ns + 100,
+                                   st_file_attributes=0)
+        # Model Windows APIs reporting different IDs/precision, with the same
+        # independently obtained Win32 identity. No metadata tolerance is added.
+        with mock.patch.object(package_iso.os, "fstat", side_effect=different_representation), \
+                mock.patch.object(package_iso, "file_identity", return_value=(123, b"a" * 16)):
+            with package_iso.open_regular(self.iso) as (source, info):
+                self.assertEqual(source.read(), self.content)
+                self.assertEqual(info.st_size, len(self.content))
+
+    def test_canonical_identity_mismatch_still_rejected(self):
+        with mock.patch.object(package_iso, "file_identity", side_effect=[(1, b"a" * 16), (1, b"b" * 16)]):
+            with self.assertRaisesRegex(ValueError, "changed while opening"):
+                with package_iso.open_regular(self.iso):
+                    self.fail("Identity mismatch must fail before any read")
+
+    def test_read_detects_real_inplace_modification(self):
+        before = self.iso.stat()
+        with self.assertRaisesRegex(ValueError, "changed while reading"):
+            with package_iso.open_regular(self.iso) as (source, _):
+                self.assertEqual(source.read(), self.content)
+                self.iso.write_bytes(b"z" * len(self.content))
+                os.utime(self.iso, ns=(before.st_atime_ns, before.st_mtime_ns + 2000000000))
+
+    def test_read_detects_path_replacement_even_same_bytes_size_and_mtime(self):
+        replacement = self.root / "replacement.iso"
+        replacement.write_bytes(self.content)
+        before = self.iso.stat()
+        os.utime(replacement, ns=(before.st_atime_ns, before.st_mtime_ns))
+        replaced = False
+        try:
+            with package_iso.open_regular(self.iso) as (source, _):
+                self.assertEqual(source.read(), self.content)
+                try:
+                    os.replace(replacement, self.iso)
+                    replaced = True
+                except PermissionError:
+                    # Some Windows handle sharing modes prevent replacement;
+                    # an OS-enforced refusal also protects the open source.
+                    pass
+        except ValueError as error:
+            self.assertTrue(replaced)
+            self.assertIn("changed while reading", str(error))
+        else:
+            self.assertFalse(replaced, "A replaced path must never pass")
+
+    def test_regular_mode_with_windows_reparse_attribute_rejected(self):
+        info = SimpleNamespace(st_mode=self.iso.stat().st_mode, st_file_attributes=0x400)
+        with self.assertRaisesRegex(ValueError, "non-reparse"):
+            package_iso.require_regular(info, "reparse.iso")
+
+    def test_cleanup_preserves_replacement_with_same_bytes(self):
+        target = self.root / "owned-output.iso"
+        owned = []
+        with target.open("xb") as output:
+            package_iso.remember_output(target, output, owned)
+            output.write(self.content)
+        replacement = self.root / "foreign-output.iso"
+        replacement.write_bytes(self.content)
+        os.replace(replacement, target)
+        package_iso.cleanup_outputs(owned)
+        self.assertEqual(target.read_bytes(), self.content)
+
+    @unittest.skipUnless(os.name == "nt", "Win32 handle identity requires an actual Windows host")
+    def test_windows_canonical_file_id_matches_path_and_handle(self):
+        with self.iso.open("rb") as source:
+            by_path = package_iso.file_identity(path=self.iso)
+            by_fd = package_iso.file_identity(fd=source.fileno())
+            self.assertEqual(by_path, by_fd)
+            self.assertEqual(len(by_fd[1]), 16)
 
 
 if __name__ == "__main__":
