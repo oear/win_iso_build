@@ -1,0 +1,49 @@
+name: Experimental foundation read-only source probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: windows-2025
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Validate input handling and prepare own probe directory
+        run: |
+          python -m unittest discover -s tests -v
+          if ($LASTEXITCODE -ne 0) { throw 'Input tests failed.' }
+          $root = Join-Path $env:RUNNER_TEMP ('foundation-probe-' + $env:GITHUB_RUN_ID)
+          New-Item -ItemType Directory -Path $root | Out-Null
+          "FOUNDATION_PROBE_ROOT=$root" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Acquire verified original media and the small canonical Foundation source
+        run: |
+          python experimental/prepare.py acquire-base --destination (Join-Path $env:FOUNDATION_PROBE_ROOT 'base')
+          if ($LASTEXITCODE -ne 0) { throw 'Base acquisition failed.' }
+          python experimental/prepare.py acquire-foundation --destination (Join-Path $env:FOUNDATION_PROBE_ROOT 'source')
+          if ($LASTEXITCODE -ne 0) { throw 'Source acquisition failed.' }
+      - name: Native read-only applicability and signature/member checks
+        run: |
+          $lock = Get-Content experimental/manifest.json -Raw | ConvertFrom-Json
+          $base = Join-Path $env:FOUNDATION_PROBE_ROOT ('base\' + $lock.base_iso.filename)
+          $source = Join-Path $env:FOUNDATION_PROBE_ROOT 'source\Microsoft-Windows-Foundation-Package.ESD'
+          & experimental/Probe-Foundation.ps1 -BaseIso $base -FoundationEsd $source -OutputDirectory (Join-Path $env:FOUNDATION_PROBE_ROOT 'evidence')
+      - name: Preserve read-only probe evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: foundation-source-probe-${{ github.run_id }}
+          path: ${{ runner.temp }}/foundation-probe-${{ github.run_id }}/evidence/**
+          retention-days: 7
+          if-no-files-found: warn

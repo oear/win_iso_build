@@ -273,7 +273,7 @@ def acquire_base(m, destination):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("validate", "acquire-base", "acquire-packages"))
+    parser.add_argument("command", choices=("validate", "acquire-base", "acquire-packages", "acquire-foundation"))
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--require-build-ready", action="store_true")
     parser.add_argument("--destination", type=Path)
@@ -286,6 +286,17 @@ def main():
             require(args.destination is not None, "--destination is required")
             actual = acquire_base(m, args.destination)
             print(json.dumps({"integrity": "matches upstream mirror lock", "microsoft_provenance": "not independently verified", **actual}, indent=2))
+        elif args.command == "acquire-foundation":
+            require(args.destination is not None, "--destination is required")
+            foundation = dict(m)
+            foundation['packages'] = [{
+                'id': 'Foundation-source-probe', 'role': 'foundation',
+                'filename': 'Microsoft-Windows-Foundation-Package.ESD', 'size': 25588,
+                'sha256': '03f8de2ae1bf94efcad630281219870ef2a21eee986e4123e81e3d5dc2e00321',
+                'sha1': 'cd53cb2957c60d86fa0a7b5aad8e48b511ba1741',
+                'source_host': 'tlu.dl.delivery.mp.microsoft.com',
+                'source_path': '/filestreamingservice/files/ccdca181-244e-49b1-9407-62c6d62cde13'}]
+            print(json.dumps(acquire_packages(foundation, args.destination, False, args.downloader), indent=2))
         elif args.command == "acquire-packages":
             require(args.destination is not None, "--destination is required")
             print(json.dumps(acquire_packages(m, args.destination, args.only_enablement, args.downloader), indent=2))
