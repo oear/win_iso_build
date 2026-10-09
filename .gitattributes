@@ -15,5 +15,5 @@
 .github/           export-ignore
 
 # Preserve downloaded metadata evidence bytes; never use normalized MUMs to service.
-experimental/evidence/*.xml -text
-experimental/evidence/*.mum -text
+experimental/evidence/*.xml -text -diff
+experimental/evidence/*.mum -text -diff
